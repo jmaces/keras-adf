@@ -20,7 +20,3 @@ __email__ = "janmaces[at]gmail.com"
 
 __license__ = "MIT"
 __copyright__ = "Copyright 2019 Jan Maces"
-
-
-# export main package functionality
-__all__ = []
