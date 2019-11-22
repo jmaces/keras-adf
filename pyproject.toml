@@ -15,7 +15,7 @@ multi_line_output = 3
 not_skip = "__init__.py"
 use_parentheses = true
 known_first_party = ["kerasadf"]
-known_third_party = ["setuptools"]
+known_third_party = ["ldprop", "numpy", "setuptools", "six", "tensorflow"]
 
 [tool.towncrier]
 package = "kerasadf"

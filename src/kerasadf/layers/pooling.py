@@ -1,11 +1,13 @@
-from .core import ADFLayer
+import numpy as np
 import tensorflow.python.keras.backend as K
-from tensorflow.python.keras.utils import conv_utils
-from tensorflow.python.keras.engine.base_layer import InputSpec
+
 from tensorflow.python.framework import tensor_shape
+from tensorflow.python.keras.engine.base_layer import InputSpec
+from tensorflow.python.keras.utils import conv_utils
 from tensorflow.python.ops import nn
 from tensorflow.python.util import nest
-import numpy as np
+
+from .core import ADFLayer
 
 
 class Pooling1D(ADFLayer):
@@ -36,53 +38,59 @@ class Pooling1D(ADFLayer):
         It defaults to the `image_data_format` value found in your
         Keras config file at `~/.keras/keras.json`.
         If you never set it, then it will be "channels_last".
-    name : string, optional
-        Name of the layer.
     """
-    def __init__(self, pool_function, pool_size, strides, padding='valid',
-                 data_format=None, name=None, **kwargs):
-        super(Pooling1D, self).__init__(name=name, **kwargs)
+
+    def __init__(
+        self,
+        pool_function,
+        pool_size,
+        strides,
+        padding="valid",
+        data_format=None,
+        **kwargs
+    ):
+        super(Pooling1D, self).__init__(**kwargs)
         if data_format is None:
             data_format = K.image_data_format()
         if strides is None:
             strides = pool_size
         self.pool_function = pool_function
-        self.pool_size = conv_utils.normalize_tuple(pool_size, 1, 'pool_size')
-        self.strides = conv_utils.normalize_tuple(strides, 1, 'strides')
+        self.pool_size = conv_utils.normalize_tuple(pool_size, 1, "pool_size")
+        self.strides = conv_utils.normalize_tuple(strides, 1, "strides")
         self.padding = conv_utils.normalize_padding(padding)
         self.data_format = conv_utils.normalize_data_format(data_format)
         self.supports_masking = False
-        if self.mode == 'diag':
+        if self.mode == "diag":
             self.input_spec = [InputSpec(ndim=3), InputSpec(ndim=3)]
-        elif self.mode == 'half':
+        elif self.mode == "half":
             self.input_spec = [InputSpec(ndim=3), InputSpec(ndim=4)]
-        elif self.mode == 'full':
+        elif self.mode == "full":
             self.input_spec = [InputSpec(ndim=3), InputSpec(ndim=5)]
 
     def call(self, inputs):
         raise NotImplementedError(
-            'Pooling1D can not be called directly. The core functionality '
-            'has to be implemented by a derived class.'
+            "Pooling1D can not be called directly. The core functionality "
+            "has to be implemented by a derived class."
         )
 
     def compute_output_shape(self, input_shape):
         input_shape[0] = tensor_shape.TensorShape(input_shape[0]).as_list()
         input_shape[1] = tensor_shape.TensorShape(input_shape[1]).as_list()
-        if self.data_format == 'channels_first':
+        if self.data_format == "channels_first":
             mean_steps = input_shape[0][2]
-            if self.mode == 'diag':
+            if self.mode == "diag":
                 cov_steps = input_shape[1][2]
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 cov_steps = input_shape[1][3]
-            elif self.mode == 'full':
+            elif self.mode == "full":
                 cov_steps = input_shape[1][2]
         else:
             mean_steps = input_shape[0][1]
-            if self.mode == 'diag':
+            if self.mode == "diag":
                 cov_steps = input_shape[1][1]
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 cov_steps = input_shape[1][2]
-            elif self.mode == 'full':
+            elif self.mode == "full":
                 cov_steps = input_shape[1][1]
         out_mean_steps = conv_utils.conv_output_length(
             mean_steps, self.pool_size[0], self.padding, self.strides[0]
@@ -90,83 +98,91 @@ class Pooling1D(ADFLayer):
         out_cov_steps = conv_utils.conv_output_length(
             cov_steps, self.pool_size[0], self.padding, self.strides[0]
         )
-        if self.data_format == 'channels_first':
-            if self.mode == 'diag':
+        if self.data_format == "channels_first":
+            if self.mode == "diag":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], input_shape[0][1],
-                         out_mean_steps]
+                        [input_shape[0][0], input_shape[0][1], out_mean_steps]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], input_shape[1][1],
-                         out_cov_steps]
+                        [input_shape[1][0], input_shape[1][1], out_cov_steps]
                     ),
                 ]
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], input_shape[0][1],
-                         out_mean_steps]
+                        [input_shape[0][0], input_shape[0][1], out_mean_steps]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], input_shape[1][1],
-                         input_shape[1][2], out_cov_steps]
+                        [
+                            input_shape[1][0],
+                            input_shape[1][1],
+                            input_shape[1][2],
+                            out_cov_steps,
+                        ]
                     ),
                 ]
-            elif self.mode == 'full':
+            elif self.mode == "full":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], input_shape[0][1],
-                         out_mean_steps]
+                        [input_shape[0][0], input_shape[0][1], out_mean_steps]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], input_shape[1][1],
-                         out_cov_steps, input_shape[1][3],
-                         out_cov_steps]
+                        [
+                            input_shape[1][0],
+                            input_shape[1][1],
+                            out_cov_steps,
+                            input_shape[1][3],
+                            out_cov_steps,
+                        ]
                     ),
                 ]
         else:
-            if self.mode == 'diag':
+            if self.mode == "diag":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], out_mean_steps,
-                         input_shape[0][2]]
+                        [input_shape[0][0], out_mean_steps, input_shape[0][2]]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], out_cov_steps,
-                         input_shape[1][2]]
+                        [input_shape[1][0], out_cov_steps, input_shape[1][2]]
                     ),
                 ]
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], out_mean_steps,
-                         input_shape[0][2]]
+                        [input_shape[0][0], out_mean_steps, input_shape[0][2]]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], input_shape[1][1],
-                         out_cov_steps, input_shape[1][3]]
+                        [
+                            input_shape[1][0],
+                            input_shape[1][1],
+                            out_cov_steps,
+                            input_shape[1][3],
+                        ]
                     ),
                 ]
-            elif self.mode == 'full':
+            elif self.mode == "full":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], out_mean_steps,
-                         input_shape[0][2]]
+                        [input_shape[0][0], out_mean_steps, input_shape[0][2]]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], out_cov_steps,
-                         input_shape[1][2], out_cov_steps,
-                         input_shape[1][4]]
+                        [
+                            input_shape[1][0],
+                            out_cov_steps,
+                            input_shape[1][2],
+                            out_cov_steps,
+                            input_shape[1][4],
+                        ]
                     ),
                 ]
 
     def get_config(self):
         config = {
-            'pool_size': self.pool_size,
-            'padding': self.padding,
-            'strides': self.strides,
-            'data_format': self.data_format,
+            "pool_size": self.pool_size,
+            "padding": self.padding,
+            "strides": self.strides,
+            "data_format": self.data_format,
         }
         base_config = super(Pooling1D, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -196,8 +212,6 @@ class MaxPooling1D(Pooling1D):
         It defaults to the `image_data_format` value found in your
         Keras config file at `~/.keras/keras.json`.
         If you never set it, then it will be "channels_last".
-    name : string, optional
-        Name of the layer.
 
     Notes
     -----
@@ -217,11 +231,19 @@ class MaxPooling1D(Pooling1D):
             3D tensor with shape:
             `(batch_size, features, pooled_steps)`
     """
-    def __init__(self, pool_size=2, strides=None, padding='valid',
-                 data_format=None, **kwargs):
+
+    def __init__(
+        self,
+        pool_size=2,
+        strides=None,
+        padding="valid",
+        data_format=None,
+        **kwargs
+    ):
         raise NotImplementedError(
-            'MaxPooling1D has not been implemented as an ADF layer yet.'
+            "MaxPooling1D has not been implemented as an ADF layer yet."
         )
+
     # super(MaxPooling1D, self).__init__(
     #     nn.max_pool,
     #     pool_size=pool_size, strides=strides,
@@ -229,7 +251,7 @@ class MaxPooling1D(Pooling1D):
 
     def call(self, inputs):
         raise NotImplementedError(
-            'MaxPooling1D has not been implemented as an ADF layer yet.'
+            "MaxPooling1D has not been implemented as an ADF layer yet."
         )
 
 
@@ -257,8 +279,6 @@ class AveragePooling1D(Pooling1D):
         It defaults to the `image_data_format` value found in your
         Keras config file at `~/.keras/keras.json`.
         If you never set it, then it will be "channels_last".
-    name : string, optional
-        Name of the layer.
 
     Notes
     -----
@@ -278,8 +298,15 @@ class AveragePooling1D(Pooling1D):
             3D tensor with shape:
             `(batch_size, features, pooled_steps)`
     """
-    def __init__(self, pool_size=2, strides=None, padding='valid',
-                 data_format=None, **kwargs):
+
+    def __init__(
+        self,
+        pool_size=2,
+        strides=None,
+        padding="valid",
+        data_format=None,
+        **kwargs
+    ):
         super(AveragePooling1D, self).__init__(
             nn.avg_pool,
             pool_size=pool_size,
@@ -293,7 +320,7 @@ class AveragePooling1D(Pooling1D):
         input_shapes = nest.map_structure(lambda x: x.shape, inputs)
         output_shapes = self.compute_output_shape(input_shapes)
         means, covariances = inputs
-        if self.data_format == 'channels_last':
+        if self.data_format == "channels_last":
             pool_shape = (1,) + self.pool_size + (1,)
             strides = (1,) + self.strides + (1,)
         else:
@@ -305,17 +332,19 @@ class AveragePooling1D(Pooling1D):
             ksize=pool_shape,
             strides=strides,
             padding=self.padding.upper(),
-            data_format=conv_utils.convert_data_format(self.data_format, 3)
+            data_format=conv_utils.convert_data_format(self.data_format, 3),
         )
-        if self.mode == 'diag':
+        if self.mode == "diag":
             outputs[1] = self.pool_function(
-                covariances/np.prod(pool_shape),
+                covariances / np.prod(pool_shape),
                 ksize=pool_shape,
                 strides=strides,
                 padding=self.padding.upper(),
-                data_format=conv_utils.convert_data_format(self.data_format, 3)
+                data_format=conv_utils.convert_data_format(
+                    self.data_format, 3
+                ),
             )
-        elif self.mode == 'half':
+        elif self.mode == "half":
             cov_shape = covariances.get_shape().as_list()
             covariances = K.reshape(covariances, [-1] + cov_shape[2:])
             outputs[1] = K.reshape(
@@ -325,16 +354,14 @@ class AveragePooling1D(Pooling1D):
                     strides=strides,
                     padding=self.padding.upper(),
                     data_format=conv_utils.convert_data_format(
-                        self.data_format, 3)
+                        self.data_format, 3
+                    ),
                 ),
                 [-1] + output_shapes[1].as_list()[1:],
             )
-        elif self.mode == 'full':
+        elif self.mode == "full":
             cov_shape = covariances.get_shape().as_list()
-            covariances = K.reshape(
-                covariances,
-                [-1] + cov_shape[3:]
-            )
+            covariances = K.reshape(covariances, [-1] + cov_shape[3:])
             covariances = K.reshape(
                 self.pool_function(
                     covariances,
@@ -342,20 +369,15 @@ class AveragePooling1D(Pooling1D):
                     strides=strides,
                     padding=self.padding.upper(),
                     data_format=conv_utils.convert_data_format(
-                        self.data_format, 3)
+                        self.data_format, 3
+                    ),
                 ),
-                ([-1] + cov_shape[1:3]
-                 + output_shapes[1].as_list()[-2:]),
+                ([-1] + cov_shape[1:3] + output_shapes[1].as_list()[-2:]),
             )
             covariances = K.permute_dimensions(
-                covariances,
-                ([0] + list(range(3, 5))
-                 + list(range(1, 3))),
+                covariances, ([0] + list(range(3, 5)) + list(range(1, 3))),
             )
-            covariances = K.reshape(
-                covariances,
-                [-1] + cov_shape[1:3]
-            )
+            covariances = K.reshape(covariances, [-1] + cov_shape[1:3])
             covariances = K.reshape(
                 self.pool_function(
                     covariances,
@@ -363,15 +385,17 @@ class AveragePooling1D(Pooling1D):
                     strides=strides,
                     padding=self.padding.upper(),
                     data_format=conv_utils.convert_data_format(
-                        self.data_format, 3)
+                        self.data_format, 3
+                    ),
                 ),
-                ([-1] + output_shapes[1].as_list()[-2:]
-                 + output_shapes[1].as_list()[1:3]),
+                (
+                    [-1]
+                    + output_shapes[1].as_list()[-2:]
+                    + output_shapes[1].as_list()[1:3]
+                ),
             )
             outputs[1] = K.permute_dimensions(
-                covariances,
-                ([0] + list(range(3, 5))
-                 + list(range(1, 3))),
+                covariances, ([0] + list(range(3, 5)) + list(range(1, 3))),
             )
         return outputs
 
@@ -406,60 +430,66 @@ class Pooling2D(ADFLayer):
         It defaults to the `image_data_format` value found in your
         Keras config file at `~/.keras/keras.json`.
         If you never set it, then it will be "channels_last".
-    name : string, optional
-        Name of the layer.
     """
-    def __init__(self, pool_function, pool_size, strides, padding='valid',
-                 data_format=None, name=None, **kwargs):
-        super(Pooling2D, self).__init__(name=name, **kwargs)
+
+    def __init__(
+        self,
+        pool_function,
+        pool_size,
+        strides,
+        padding="valid",
+        data_format=None,
+        **kwargs
+    ):
+        super(Pooling2D, self).__init__(**kwargs)
         if data_format is None:
             data_format = K.image_data_format()
         if strides is None:
             strides = pool_size
         self.pool_function = pool_function
-        self.pool_size = conv_utils.normalize_tuple(pool_size, 2, 'pool_size')
-        self.strides = conv_utils.normalize_tuple(strides, 2, 'strides')
+        self.pool_size = conv_utils.normalize_tuple(pool_size, 2, "pool_size")
+        self.strides = conv_utils.normalize_tuple(strides, 2, "strides")
         self.padding = conv_utils.normalize_padding(padding)
         self.data_format = conv_utils.normalize_data_format(data_format)
         self.supports_masking = False
-        if self.mode == 'diag':
+        if self.mode == "diag":
             self.input_spec = [InputSpec(ndim=4), InputSpec(ndim=4)]
-        elif self.mode == 'half':
+        elif self.mode == "half":
             self.input_spec = [InputSpec(ndim=4), InputSpec(ndim=5)]
-        elif self.mode == 'full':
+        elif self.mode == "full":
             self.input_spec = [InputSpec(ndim=4), InputSpec(ndim=7)]
 
     def call(self, inputs):
         raise NotImplementedError(
-            'Pooling2D can not be called directly. The core functionality '
-            'has to be implemented by a derived class.'
+            "Pooling2D can not be called directly. The core functionality "
+            "has to be implemented by a derived class."
         )
 
     def compute_output_shape(self, input_shape):
         input_shape[0] = tensor_shape.TensorShape(input_shape[0]).as_list()
         input_shape[1] = tensor_shape.TensorShape(input_shape[1]).as_list()
-        if self.data_format == 'channels_first':
+        if self.data_format == "channels_first":
             mean_rows = input_shape[0][2]
             mean_cols = input_shape[0][3]
-            if self.mode == 'diag':
+            if self.mode == "diag":
                 cov_rows = input_shape[1][2]
                 cov_cols = input_shape[1][3]
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 cov_rows = input_shape[1][3]
                 cov_cols = input_shape[1][4]
-            elif self.mode == 'full':
+            elif self.mode == "full":
                 cov_rows = input_shape[1][2]
                 cov_cols = input_shape[1][3]
         else:
             mean_rows = input_shape[0][1]
             mean_cols = input_shape[0][2]
-            if self.mode == 'diag':
+            if self.mode == "diag":
                 cov_rows = input_shape[1][1]
                 cov_cols = input_shape[1][2]
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 cov_rows = input_shape[1][2]
                 cov_cols = input_shape[1][3]
-            elif self.mode == 'full':
+            elif self.mode == "full":
                 cov_rows = input_shape[1][1]
                 cov_cols = input_shape[1][2]
         out_mean_rows = conv_utils.conv_output_length(
@@ -468,87 +498,143 @@ class Pooling2D(ADFLayer):
         out_mean_cols = conv_utils.conv_output_length(
             mean_cols, self.pool_size[1], self.padding, self.strides[1]
         )
-        out_cov_rows = conv_utils.conv_output_length(cov_rows, self.pool_size[0],
-                                                 self.padding, self.strides[0])
-        out_cov_cols = conv_utils.conv_output_length(cov_cols, self.pool_size[1],
-                                                 self.padding, self.strides[1])
-        if self.data_format == 'channels_first':
-            if self.mode == 'diag':
+        out_cov_rows = conv_utils.conv_output_length(
+            cov_rows, self.pool_size[0], self.padding, self.strides[0]
+        )
+        out_cov_cols = conv_utils.conv_output_length(
+            cov_cols, self.pool_size[1], self.padding, self.strides[1]
+        )
+        if self.data_format == "channels_first":
+            if self.mode == "diag":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], input_shape[0][1],
-                         out_mean_rows, out_mean_cols]
+                        [
+                            input_shape[0][0],
+                            input_shape[0][1],
+                            out_mean_rows,
+                            out_mean_cols,
+                        ]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], input_shape[1][1],
-                         out_cov_rows, out_cov_cols]
+                        [
+                            input_shape[1][0],
+                            input_shape[1][1],
+                            out_cov_rows,
+                            out_cov_cols,
+                        ]
                     ),
                 ]
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], input_shape[0][1],
-                         out_mean_rows, out_mean_cols]
+                        [
+                            input_shape[0][0],
+                            input_shape[0][1],
+                            out_mean_rows,
+                            out_mean_cols,
+                        ]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], input_shape[1][1],
-                         input_shape[1][2], out_cov_rows, out_cov_cols]
+                        [
+                            input_shape[1][0],
+                            input_shape[1][1],
+                            input_shape[1][2],
+                            out_cov_rows,
+                            out_cov_cols,
+                        ]
                     ),
                 ]
-            elif self.mode == 'full':
+            elif self.mode == "full":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], input_shape[0][1],
-                         out_mean_rows, out_mean_cols]
+                        [
+                            input_shape[0][0],
+                            input_shape[0][1],
+                            out_mean_rows,
+                            out_mean_cols,
+                        ]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], input_shape[1][1],
-                         out_cov_rows, out_cov_cols, input_shape[1][4],
-                         out_cov_rows, out_cov_cols]
+                        [
+                            input_shape[1][0],
+                            input_shape[1][1],
+                            out_cov_rows,
+                            out_cov_cols,
+                            input_shape[1][4],
+                            out_cov_rows,
+                            out_cov_cols,
+                        ]
                     ),
                 ]
         else:
-            if self.mode == 'diag':
+            if self.mode == "diag":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], out_mean_rows, out_mean_cols,
-                         input_shape[0][3]]
+                        [
+                            input_shape[0][0],
+                            out_mean_rows,
+                            out_mean_cols,
+                            input_shape[0][3],
+                        ]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], out_cov_rows, out_cov_cols,
-                         input_shape[1][3]]
+                        [
+                            input_shape[1][0],
+                            out_cov_rows,
+                            out_cov_cols,
+                            input_shape[1][3],
+                        ]
                     ),
                 ]
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], out_mean_rows, out_mean_cols,
-                         input_shape[0][3]]
+                        [
+                            input_shape[0][0],
+                            out_mean_rows,
+                            out_mean_cols,
+                            input_shape[0][3],
+                        ]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], input_shape[1][1],
-                         out_cov_rows, out_cov_cols, input_shape[1][4]]
+                        [
+                            input_shape[1][0],
+                            input_shape[1][1],
+                            out_cov_rows,
+                            out_cov_cols,
+                            input_shape[1][4],
+                        ]
                     ),
                 ]
-            elif self.mode == 'full':
+            elif self.mode == "full":
                 return [
                     tensor_shape.TensorShape(
-                        [input_shape[0][0], out_mean_rows, out_mean_cols,
-                         input_shape[0][3]]
+                        [
+                            input_shape[0][0],
+                            out_mean_rows,
+                            out_mean_cols,
+                            input_shape[0][3],
+                        ]
                     ),
                     tensor_shape.TensorShape(
-                        [input_shape[1][0], out_cov_rows, out_cov_cols,
-                         input_shape[1][3], out_cov_rows, out_cov_cols,
-                         input_shape[1][6]]
+                        [
+                            input_shape[1][0],
+                            out_cov_rows,
+                            out_cov_cols,
+                            input_shape[1][3],
+                            out_cov_rows,
+                            out_cov_cols,
+                            input_shape[1][6],
+                        ]
                     ),
                 ]
 
     def get_config(self):
         config = {
-            'pool_size': self.pool_size,
-            'padding': self.padding,
-            'strides': self.strides,
-            'data_format': self.data_format,
+            "pool_size": self.pool_size,
+            "padding": self.padding,
+            "strides": self.strides,
+            "data_format": self.data_format,
         }
         base_config = super(Pooling2D, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -581,8 +667,6 @@ class MaxPooling2D(Pooling2D):
         It defaults to the `image_data_format` value found in your
         Keras config file at `~/.keras/keras.json`.
         If you never set it, then it will be "channels_last".
-    name : string, optional
-        Name of the layer.
 
 
     Notes
@@ -603,11 +687,19 @@ class MaxPooling2D(Pooling2D):
             4D tensor with shape:
             `(batch_size, channels, pooled_rows, pooled_cols)`
     """
-    def __init__(self, pool_size=(2, 2), strides=None, padding='valid',
-                 data_format=None, **kwargs):
+
+    def __init__(
+        self,
+        pool_size=(2, 2),
+        strides=None,
+        padding="valid",
+        data_format=None,
+        **kwargs
+    ):
         raise NotImplementedError(
-            'MaxPooling2D has not been implemented as an ADF layer yet.'
+            "MaxPooling2D has not been implemented as an ADF layer yet."
         )
+
     # super(MaxPooling2D, self).__init__(
     #     nn.max_pool,
     #     pool_size=pool_size, strides=strides,
@@ -615,7 +707,7 @@ class MaxPooling2D(Pooling2D):
 
     def call(self, inputs):
         raise NotImplementedError(
-            'MaxPooling2D has not been implemented as an ADF layer yet.'
+            "MaxPooling2D has not been implemented as an ADF layer yet."
         )
 
 
@@ -647,8 +739,6 @@ class AveragePooling2D(Pooling2D):
         It defaults to the `image_data_format` value found in your
         Keras config file at `~/.keras/keras.json`.
         If you never set it, then it will be "channels_last".
-    name : string, optional
-        Name of the layer.
 
 
     Notes
@@ -669,8 +759,15 @@ class AveragePooling2D(Pooling2D):
             4D tensor with shape:
             `(batch_size, channels, pooled_rows, pooled_cols)`
     """
-    def __init__(self, pool_size=(2, 2), strides=None, padding='valid',
-                 data_format=None, **kwargs):
+
+    def __init__(
+        self,
+        pool_size=(2, 2),
+        strides=None,
+        padding="valid",
+        data_format=None,
+        **kwargs
+    ):
         super(AveragePooling2D, self).__init__(
             nn.avg_pool,
             pool_size=pool_size,
@@ -684,7 +781,7 @@ class AveragePooling2D(Pooling2D):
         input_shapes = nest.map_structure(lambda x: x.shape, inputs)
         output_shapes = self.compute_output_shape(input_shapes)
         means, covariances = inputs
-        if self.data_format == 'channels_last':
+        if self.data_format == "channels_last":
             pool_shape = (1,) + self.pool_size + (1,)
             strides = (1,) + self.strides + (1,)
         else:
@@ -696,17 +793,19 @@ class AveragePooling2D(Pooling2D):
             ksize=pool_shape,
             strides=strides,
             padding=self.padding.upper(),
-            data_format=conv_utils.convert_data_format(self.data_format, 4)
+            data_format=conv_utils.convert_data_format(self.data_format, 4),
         )
-        if self.mode == 'diag':
+        if self.mode == "diag":
             outputs[1] = self.pool_function(
-                covariances/np.prod(pool_shape),
+                covariances / np.prod(pool_shape),
                 ksize=pool_shape,
                 strides=strides,
                 padding=self.padding.upper(),
-                data_format=conv_utils.convert_data_format(self.data_format, 4)
+                data_format=conv_utils.convert_data_format(
+                    self.data_format, 4
+                ),
             )
-        elif self.mode == 'half':
+        elif self.mode == "half":
             cov_shape = covariances.get_shape().as_list()
             covariances = K.reshape(covariances, [-1] + cov_shape[2:])
             outputs[1] = K.reshape(
@@ -716,16 +815,14 @@ class AveragePooling2D(Pooling2D):
                     strides=strides,
                     padding=self.padding.upper(),
                     data_format=conv_utils.convert_data_format(
-                        self.data_format, 4)
+                        self.data_format, 4
+                    ),
                 ),
                 [-1] + output_shapes[1].as_list()[1:],
             )
-        elif self.mode == 'full':
+        elif self.mode == "full":
             cov_shape = covariances.get_shape().as_list()
-            covariances = K.reshape(
-                covariances,
-                [-1] + cov_shape[4:]
-            )
+            covariances = K.reshape(covariances, [-1] + cov_shape[4:])
             covariances = K.reshape(
                 self.pool_function(
                     covariances,
@@ -733,20 +830,15 @@ class AveragePooling2D(Pooling2D):
                     strides=strides,
                     padding=self.padding.upper(),
                     data_format=conv_utils.convert_data_format(
-                        self.data_format, 4)
+                        self.data_format, 4
+                    ),
                 ),
-                ([-1] + cov_shape[1:4]
-                 + output_shapes[1].as_list()[-3:]),
+                ([-1] + cov_shape[1:4] + output_shapes[1].as_list()[-3:]),
             )
             covariances = K.permute_dimensions(
-                covariances,
-                ([0] + list(range(4, 7))
-                 + list(range(1, 4))),
+                covariances, ([0] + list(range(4, 7)) + list(range(1, 4))),
             )
-            covariances = K.reshape(
-                covariances,
-                [-1] + cov_shape[1:4]
-            )
+            covariances = K.reshape(covariances, [-1] + cov_shape[1:4])
             covariances = K.reshape(
                 self.pool_function(
                     covariances,
@@ -754,14 +846,16 @@ class AveragePooling2D(Pooling2D):
                     strides=strides,
                     padding=self.padding.upper(),
                     data_format=conv_utils.convert_data_format(
-                        self.data_format, 4)
+                        self.data_format, 4
+                    ),
                 ),
-                ([-1] + output_shapes[1].as_list()[-3:]
-                 + output_shapes[1].as_list()[1:4]),
+                (
+                    [-1]
+                    + output_shapes[1].as_list()[-3:]
+                    + output_shapes[1].as_list()[1:4]
+                ),
             )
             outputs[1] = K.permute_dimensions(
-                covariances,
-                ([0] + list(range(4, 7))
-                 + list(range(1, 4))),
+                covariances, ([0] + list(range(4, 7)) + list(range(1, 4))),
             )
         return outputs

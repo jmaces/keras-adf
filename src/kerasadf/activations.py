@@ -1,21 +1,21 @@
-import six
 import numpy as np
-from tensorflow.python.ops import math_ops
-from tensorflow.python.ops import array_ops
+import six
+
 from tensorflow.python.keras import backend as K
+from tensorflow.python.ops import array_ops, math_ops
 
 
 # private helper function for relu, pdf of standard normal distribution
 def _gauss_density(x):
-    return 1/np.sqrt(2*np.pi)*K.exp(-K.square(x)/2)
+    return 1 / np.sqrt(2 * np.pi) * K.exp(-K.square(x) / 2)
 
 
 # private helper function for relu, cdf of standard normal distribution
 def _gauss_cumulative(x):
-    return 1/2*(1+math_ops.erf(x/np.sqrt(2)))
+    return 1 / 2 * (1 + math_ops.erf(x / np.sqrt(2)))
 
 
-def relu(x, alpha=0.0, max_value=None, threshold=0.0, mode='diag'):
+def relu(x, alpha=0.0, max_value=None, threshold=0.0, mode="diag"):
     """Rectified Linear Unit.
 
     Assumed Density Filtering (ADF) version of the Keras `relu` activation.
@@ -44,22 +44,24 @@ def relu(x, alpha=0.0, max_value=None, threshold=0.0, mode='diag'):
     """
     if not alpha == 0.0:
         raise NotImplementedError(
-            'The relu activation function with alpha other than 0.0 has'
-            'not been implemented for ADF layers yet.'
+            "The relu activation function with alpha other than 0.0 has"
+            "not been implemented for ADF layers yet."
         )
     if max_value is not None:
         raise NotImplementedError(
-            'The relu activation function with max_value other than `None` has '
-            'not been implemented for ADF layers yet.'
+            "The relu activation function with max_value other than `None` "
+            "has not been implemented for ADF layers yet."
         )
     if not threshold == 0.0:
         raise NotImplementedError(
-            'The relu activation function with threshold other than 0.0 has'
-            'not been implemented for ADF layers yet.'
+            "The relu activation function with threshold other than 0.0 has"
+            "not been implemented for ADF layers yet."
         )
     if not isinstance(x, list) and len(x) == 2:
-        raise ValueError('The relu activation function expects a list of '
-                         'exactly two input tensors, but got: %s' % x)
+        raise ValueError(
+            "The relu activation function expects a list of "
+            "exactly two input tensors, but got: %s" % x
+        )
     means, covariances = x
     means_shape = means.get_shape().as_list()
     means_rank = len(means_shape)
@@ -74,57 +76,54 @@ def relu(x, alpha=0.0, max_value=None, threshold=0.0, mode='diag'):
         pass
     else:
         # if rank(mean)=2+n, treat as batch of rank=n tensors + channels
-        means = K.reshape(
-            means,
-            [-1] + [K.prod(means_shape[1:])],
-        )
-        if mode == 'diag':
+        means = K.reshape(means, [-1] + [K.prod(means_shape[1:])],)
+        if mode == "diag":
             covariances = K.reshape(
-                covariances,
-                [-1] + [K.prod(cov_shape[1:])],
+                covariances, [-1] + [K.prod(cov_shape[1:])],
             )
-        elif mode == 'half':
+        elif mode == "half":
             covariances = K.reshape(
-                covariances,
-                [-1] + [cov_shape[1]] + [K.prod(cov_shape[2:])],
+                covariances, [-1] + [cov_shape[1]] + [K.prod(cov_shape[2:])],
             )
-        elif mode == 'full':
+        elif mode == "full":
             covariances = K.reshape(
                 covariances,
                 [-1]
-                + [K.prod(cov_shape[1:(cov_rank-1)//2+1])]
-                + [K.prod(cov_shape[(cov_rank-1)//2+1:])],
+                + [K.prod(cov_shape[1 : (cov_rank - 1) // 2 + 1])]
+                + [K.prod(cov_shape[(cov_rank - 1) // 2 + 1 :])],
             )
 
-    if mode == 'diag':
+    if mode == "diag":
         covariances = covariances + K.epsilon()
         std = K.sqrt(covariances)
-        div = means/std
+        div = means / std
         gd_div = _gauss_density(div)
         gc_div = _gauss_cumulative(div)
-        new_means = means*gc_div + std*gd_div
+        new_means = means * gc_div + std * gd_div
         new_covariances = (
-            (K.square(means)+covariances)*gc_div
-            + means*std*gd_div
+            (K.square(means) + covariances) * gc_div
+            + means * std * gd_div
             - K.square(new_means)
         )
         new_covariances = K.maximum(0.0, new_covariances)
-    elif mode == 'half':
-        variances = math_ops.reduce_sum(K.square(covariances), axis=1) + K.epsilon()
+    elif mode == "half":
+        variances = (
+            math_ops.reduce_sum(K.square(covariances), axis=1) + K.epsilon()
+        )
         std = K.sqrt(variances)
-        div = means/std
+        div = means / std
         gd_div = _gauss_density(div)
         gc_div = _gauss_cumulative(div)
-        new_means = means*gc_div + std*gd_div
+        new_means = means * gc_div + std * gd_div
         gc_div = K.expand_dims(gc_div, 1)
         new_covariances = covariances * gc_div
-    elif mode == 'full':
+    elif mode == "full":
         variances = array_ops.matrix_diag_part(covariances) + 1e-7
         std = K.sqrt(variances)
-        div = means/std
+        div = means / std
         gd_div = _gauss_density(div)
         gc_div = _gauss_cumulative(div)
-        new_means = means*gc_div + std*gd_div
+        new_means = means * gc_div + std * gd_div
         gc_div = K.expand_dims(gc_div, 1)
         new_covariances = covariances * gc_div
         new_covariances = K.permute_dimensions(new_covariances, [0, 2, 1])
@@ -136,7 +135,7 @@ def relu(x, alpha=0.0, max_value=None, threshold=0.0, mode='diag'):
     return [new_means, new_covariances]
 
 
-def linear(x, mode='diag'):
+def linear(x, mode="diag"):
     """Linear (identity) activation function.
 
     Assumed Density Filtering (ADF) version of the Keras `linear` activation.
@@ -168,8 +167,11 @@ def deserialize(name, custom_objects=None):
     else:
         fn = globals().get(name)
         if fn is None:
-            print('WARNING: Unknown activation function: ' + name
-                  + ' It has been replaced by the linear identity activation')
+            print(
+                "WARNING: Unknown activation function: "
+                + name
+                + " It has been replaced by the linear identity activation"
+            )
             fn = linear
     return fn
 
@@ -183,5 +185,6 @@ def get(identifier):
     elif callable(identifier):
         return identifier
     else:
-        raise ValueError('Could not interpret activation function identifier:',
-                         identifier)
+        raise ValueError(
+            "Could not interpret activation function identifier:", identifier
+        )

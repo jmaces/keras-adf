@@ -1,13 +1,13 @@
-from tensorflow.python.keras import constraints, initializers, regularizers
-from tensorflow.python.keras.utils import conv_utils
-from .core import ADFLayer
-from .. import activations
-from tensorflow.python.keras.engine.base_layer import InputSpec
-from tensorflow.python.ops import nn_ops
 from tensorflow.python.framework import tensor_shape
-from tensorflow.python.util import nest
-from tensorflow.python.ops import nn
 from tensorflow.python.keras import backend as K
+from tensorflow.python.keras import constraints, initializers, regularizers
+from tensorflow.python.keras.engine.base_layer import InputSpec
+from tensorflow.python.keras.utils import conv_utils
+from tensorflow.python.ops import nn_ops
+from tensorflow.python.util import nest
+
+from .. import activations
+from .core import ADFLayer
 
 
 class Conv(ADFLayer):
@@ -72,23 +72,26 @@ class Conv(ADFLayer):
         Default is `None`.
     """
 
-    def __init__(self, rank,
-                 filters,
-                 kernel_size,
-                 strides=1,
-                 padding='valid',
-                 data_format=None,
-                 dilation_rate=1,
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 activity_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
+    def __init__(
+        self,
+        rank,
+        filters,
+        kernel_size,
+        strides=1,
+        padding="valid",
+        data_format=None,
+        dilation_rate=1,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
         super(Conv, self).__init__(
             activity_regularizer=regularizers.get(activity_regularizer),
             **kwargs
@@ -96,12 +99,14 @@ class Conv(ADFLayer):
         self.rank = rank
         self.filters = filters
         self.kernel_size = conv_utils.normalize_tuple(
-            kernel_size, rank, 'kernel_size')
-        self.strides = conv_utils.normalize_tuple(strides, rank, 'strides')
+            kernel_size, rank, "kernel_size"
+        )
+        self.strides = conv_utils.normalize_tuple(strides, rank, "strides")
         self.padding = conv_utils.normalize_padding(padding)
         self.data_format = conv_utils.normalize_data_format(data_format)
         self.dilation_rate = conv_utils.normalize_tuple(
-            dilation_rate, rank, 'dilation_rate')
+            dilation_rate, rank, "dilation_rate"
+        )
         self.activation = activations.get(activation)
         self.use_bias = use_bias
         self.kernel_initializer = initializers.get(kernel_initializer)
@@ -111,96 +116,122 @@ class Conv(ADFLayer):
         self.kernel_constraint = constraints.get(kernel_constraint)
         self.bias_constraint = constraints.get(bias_constraint)
         self.supports_masking = False
-        if self.mode == 'diag':
-            self.input_spec = [InputSpec(ndim=self.rank + 2),
-                               InputSpec(ndim=self.rank + 2)]
-        elif self.mode == 'half':
-            self.input_spec = [InputSpec(ndim=self.rank + 2),
-                               InputSpec(ndim=self.rank + 3)]
-        elif self.mode == 'full':
-            self.input_spec = [InputSpec(ndim=self.rank + 2),
-                               InputSpec(ndim=2 * self.rank + 3)]
+        if self.mode == "diag":
+            self.input_spec = [
+                InputSpec(ndim=self.rank + 2),
+                InputSpec(ndim=self.rank + 2),
+            ]
+        elif self.mode == "half":
+            self.input_spec = [
+                InputSpec(ndim=self.rank + 2),
+                InputSpec(ndim=self.rank + 3),
+            ]
+        elif self.mode == "full":
+            self.input_spec = [
+                InputSpec(ndim=self.rank + 2),
+                InputSpec(ndim=2 * self.rank + 3),
+            ]
 
     def build(self, input_shape):
         input_shape[0] = tensor_shape.TensorShape(input_shape[0])
         input_shape[1] = tensor_shape.TensorShape(input_shape[1])
-        if self.data_format == 'channels_first':
+        if self.data_format == "channels_first":
             mean_channel_axis = 1
-            if self.mode == 'diag':
+            if self.mode == "diag":
                 cov_channel_axis = 1
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 cov_channel_axis = 2
-            elif self.mode == 'full':
+            elif self.mode == "full":
                 cov_channel_axis = [1, 2 + self.rank]
         else:
             mean_channel_axis = -1
-            if self.mode == 'diag':
+            if self.mode == "diag":
                 cov_channel_axis = -1
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 cov_channel_axis = -1
-            elif self.mode == 'full':
-                cov_channel_axis = [-1, -self.rank-2]
-        if (input_shape[0][mean_channel_axis].value is None):
-            raise ValueError('The channel dimension of the inputs '
-                             'should be defined. Found `None`.')
-        if (self.mode == 'diag' and
-                (input_shape[1][cov_channel_axis].value is None)):
-            raise ValueError('The channel dimension of the inputs '
-                             'should be defined. Found `None`.')
-        if (self.mode == 'half' and
-                (input_shape[1][cov_channel_axis].value is None)):
-            raise ValueError('The channel dimension of the inputs '
-                             'should be defined. Found `None`.')
-        if (self.mode == 'full' and
-                (input_shape[1][cov_channel_axis[0]].value is None or
-                 input_shape[1][cov_channel_axis[1]].value is None)):
-            raise ValueError('The channel dimension of the inputs '
-                             'should be defined. Found `None`.')
+            elif self.mode == "full":
+                cov_channel_axis = [-1, -self.rank - 2]
+        if input_shape[0][mean_channel_axis].value is None:
+            raise ValueError(
+                "The channel dimension of the inputs "
+                "should be defined. Found `None`."
+            )
+        if self.mode == "diag" and (
+            input_shape[1][cov_channel_axis].value is None
+        ):
+            raise ValueError(
+                "The channel dimension of the inputs "
+                "should be defined. Found `None`."
+            )
+        if self.mode == "half" and (
+            input_shape[1][cov_channel_axis].value is None
+        ):
+            raise ValueError(
+                "The channel dimension of the inputs "
+                "should be defined. Found `None`."
+            )
+        if self.mode == "full" and (
+            input_shape[1][cov_channel_axis[0]].value is None
+            or input_shape[1][cov_channel_axis[1]].value is None
+        ):
+            raise ValueError(
+                "The channel dimension of the inputs "
+                "should be defined. Found `None`."
+            )
         input_dim = int(input_shape[0][mean_channel_axis])
         kernel_shape = self.kernel_size + (input_dim, self.filters)
 
         self.kernel = self.add_variable(
-            name='kernel',
+            name="kernel",
             shape=kernel_shape,
             initializer=self.kernel_initializer,
             regularizer=self.kernel_regularizer,
             constraint=self.kernel_constraint,
             trainable=True,
-            dtype=self.dtype
+            dtype=self.dtype,
         )
         if self.use_bias:
             self.bias = self.add_variable(
-                name='bias',
+                name="bias",
                 shape=(self.filters,),
                 initializer=self.bias_initializer,
                 regularizer=self.bias_regularizer,
                 constraint=self.bias_constraint,
                 trainable=True,
-                dtype=self.dtype
+                dtype=self.dtype,
             )
         else:
             self.bias = None
-        if self.mode == 'diag':
+        if self.mode == "diag":
             self.input_spec = [
-                InputSpec(ndim=self.rank + 2,
-                          axes={mean_channel_axis: input_dim}),
-                InputSpec(ndim=self.rank + 2,
-                          axes={cov_channel_axis: input_dim}),
+                InputSpec(
+                    ndim=self.rank + 2, axes={mean_channel_axis: input_dim}
+                ),
+                InputSpec(
+                    ndim=self.rank + 2, axes={cov_channel_axis: input_dim}
+                ),
             ]
-        elif self.mode == 'half':
+        elif self.mode == "half":
             self.input_spec = [
-                InputSpec(ndim=self.rank + 2,
-                          axes={mean_channel_axis: input_dim}),
-                InputSpec(ndim=self.rank + 3,
-                          axes={cov_channel_axis: input_dim}),
+                InputSpec(
+                    ndim=self.rank + 2, axes={mean_channel_axis: input_dim}
+                ),
+                InputSpec(
+                    ndim=self.rank + 3, axes={cov_channel_axis: input_dim}
+                ),
             ]
-        elif self.mode == 'full':
+        elif self.mode == "full":
             self.input_spec = [
-                InputSpec(ndim=self.rank + 2,
-                          axes={mean_channel_axis: input_dim}),
-                InputSpec(ndim=2 * self.rank + 3,
-                          axes={cov_channel_axis[0]: input_dim,
-                                cov_channel_axis[1]: input_dim}),
+                InputSpec(
+                    ndim=self.rank + 2, axes={mean_channel_axis: input_dim}
+                ),
+                InputSpec(
+                    ndim=2 * self.rank + 3,
+                    axes={
+                        cov_channel_axis[0]: input_dim,
+                        cov_channel_axis[1]: input_dim,
+                    },
+                ),
             ]
         self._convolution_op = nn_ops.Convolution(
             input_shape[0],
@@ -208,8 +239,9 @@ class Conv(ADFLayer):
             dilation_rate=self.dilation_rate,
             strides=self.strides,
             padding=self.padding.upper(),
-            data_format=conv_utils.convert_data_format(self.data_format,
-                                                       self.rank + 2)
+            data_format=conv_utils.convert_data_format(
+                self.data_format, self.rank + 2
+            ),
         )
         self.built = True
 
@@ -219,52 +251,62 @@ class Conv(ADFLayer):
         means, covariances = inputs
         outputs = [[], []]
         outputs[0] = self._convolution_op(means, self.kernel)
-        if self.mode == 'diag':
-            outputs[1] = self._convolution_op(covariances,
-                                              K.square(self.kernel))
-        elif self.mode == 'half':
+        if self.mode == "diag":
+            outputs[1] = self._convolution_op(
+                covariances, K.square(self.kernel)
+            )
+        elif self.mode == "half":
             cov_shape = covariances.get_shape().as_list()
             covariances = K.reshape(covariances, [-1] + cov_shape[2:])
             outputs[1] = K.reshape(
                 self._convolution_op(covariances, self.kernel),
                 [-1] + output_shapes[1].as_list()[1:],
             )
-        elif self.mode == 'full':
+        elif self.mode == "full":
             cov_shape = covariances.get_shape().as_list()
             covariances = K.reshape(
-                covariances,
-                [-1] + cov_shape[self.rank + 2:]
+                covariances, [-1] + cov_shape[self.rank + 2 :]
             )
             covariances = K.reshape(
                 self._convolution_op(covariances, self.kernel),
-                ([-1] + cov_shape[1:self.rank+2]
-                 + output_shapes[1].as_list()[-self.rank-1:]),
+                (
+                    [-1]
+                    + cov_shape[1 : self.rank + 2]
+                    + output_shapes[1].as_list()[-self.rank - 1 :]
+                ),
             )
             covariances = K.permute_dimensions(
                 covariances,
-                ([0] + list(range(self.rank+2, 2*self.rank + 3))
-                 + list(range(1, self.rank + 2))),
+                (
+                    [0]
+                    + list(range(self.rank + 2, 2 * self.rank + 3))
+                    + list(range(1, self.rank + 2))
+                ),
             )
             covariances = K.reshape(
-                covariances,
-                [-1] + cov_shape[1:self.rank + 2]
+                covariances, [-1] + cov_shape[1 : self.rank + 2]
             )
             covariances = K.reshape(
                 self._convolution_op(covariances, self.kernel),
-                ([-1] + output_shapes[1].as_list()[-self.rank-1:]
-                 + output_shapes[1].as_list()[1:self.rank + 2]),
+                (
+                    [-1]
+                    + output_shapes[1].as_list()[-self.rank - 1 :]
+                    + output_shapes[1].as_list()[1 : self.rank + 2]
+                ),
             )
             outputs[1] = K.permute_dimensions(
                 covariances,
-                ([0] + list(range(self.rank+2, 2*self.rank + 3))
-                 + list(range(1, self.rank + 2))),
+                (
+                    [0]
+                    + list(range(self.rank + 2, 2 * self.rank + 3))
+                    + list(range(1, self.rank + 2))
+                ),
             )
 
         if self.use_bias:
             outputs[0] = K.bias_add(
-                outputs[0],
-                self.bias,
-                data_format=self.data_format)
+                outputs[0], self.bias, data_format=self.data_format
+            )
 
         if self.activation is not None:
             return self.activation(outputs, mode=self.mode)
@@ -273,7 +315,7 @@ class Conv(ADFLayer):
     def compute_output_shape(self, input_shape):
         input_shape[0] = tensor_shape.TensorShape(input_shape[0]).as_list()
         input_shape[1] = tensor_shape.TensorShape(input_shape[1]).as_list()
-        if self.data_format == 'channels_last':
+        if self.data_format == "channels_last":
             space = input_shape[0][1:-1]
             new_space = []
             for i in range(len(space)):
@@ -285,27 +327,36 @@ class Conv(ADFLayer):
                     dilation=self.dilation_rate[i],
                 )
                 new_space.append(new_dim)
-            if self.mode == 'diag':
+            if self.mode == "diag":
                 return [
-                    tensor_shape.TensorShape([input_shape[0][0]] + new_space
-                                             + [self.filters]),
-                    tensor_shape.TensorShape([input_shape[1][0]] + new_space
-                                             + [self.filters]),
+                    tensor_shape.TensorShape(
+                        [input_shape[0][0]] + new_space + [self.filters]
+                    ),
+                    tensor_shape.TensorShape(
+                        [input_shape[1][0]] + new_space + [self.filters]
+                    ),
                 ]
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 return [
-                    tensor_shape.TensorShape([input_shape[0][0]] + new_space
-                                             + [self.filters]),
-                    tensor_shape.TensorShape(input_shape[1][0:2] + new_space
-                                             + [self.filters]),
+                    tensor_shape.TensorShape(
+                        [input_shape[0][0]] + new_space + [self.filters]
+                    ),
+                    tensor_shape.TensorShape(
+                        input_shape[1][0:2] + new_space + [self.filters]
+                    ),
                 ]
-            elif self.mode == 'full':
+            elif self.mode == "full":
                 return [
-                    tensor_shape.TensorShape([input_shape[0][0]] + new_space
-                                             + [self.filters]),
-                    tensor_shape.TensorShape([input_shape[1][0]] + new_space
-                                             + [self.filters] + new_space
-                                             + [self.filters]),
+                    tensor_shape.TensorShape(
+                        [input_shape[0][0]] + new_space + [self.filters]
+                    ),
+                    tensor_shape.TensorShape(
+                        [input_shape[1][0]]
+                        + new_space
+                        + [self.filters]
+                        + new_space
+                        + [self.filters]
+                    ),
                 ]
         else:
             space = input_shape[0][2:]
@@ -319,49 +370,60 @@ class Conv(ADFLayer):
                     dilation=self.dilation_rate[i],
                 )
                 new_space.append(new_dim)
-            if self.mode == 'diag':
+            if self.mode == "diag":
                 return [
-                    tensor_shape.TensorShape([input_shape[0][0], self.filters]
-                                             + new_space),
-                    tensor_shape.TensorShape([input_shape[1][0], self.filters]
-                                             + new_space),
+                    tensor_shape.TensorShape(
+                        [input_shape[0][0], self.filters] + new_space
+                    ),
+                    tensor_shape.TensorShape(
+                        [input_shape[1][0], self.filters] + new_space
+                    ),
                 ]
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 return [
-                    tensor_shape.TensorShape([input_shape[0][0], self.filters]
-                                             + new_space),
-                    tensor_shape.TensorShape(input_shape[1][0:2]
-                                             + [self.filters] + new_space),
+                    tensor_shape.TensorShape(
+                        [input_shape[0][0], self.filters] + new_space
+                    ),
+                    tensor_shape.TensorShape(
+                        input_shape[1][0:2] + [self.filters] + new_space
+                    ),
                 ]
-            elif self.mode == 'full':
+            elif self.mode == "full":
                 return [
-                    tensor_shape.TensorShape([input_shape[0][0], self.filters]
-                                             + new_space),
-                    tensor_shape.TensorShape([input_shape[1][0], self.filters]
-                                             + new_space + [self.filters]
-                                             + new_space),
+                    tensor_shape.TensorShape(
+                        [input_shape[0][0], self.filters] + new_space
+                    ),
+                    tensor_shape.TensorShape(
+                        [input_shape[1][0], self.filters]
+                        + new_space
+                        + [self.filters]
+                        + new_space
+                    ),
                 ]
 
     def get_config(self):
         config = {
-            'filters': self.filters,
-            'kernel_size': self.kernel_size,
-            'strides': self.strides,
-            'padding': self.padding,
-            'data_format': self.data_format,
-            'dilation_rate': self.dilation_rate,
-            'activation': activations.serialize(self.activation),
-            'use_bias': self.use_bias,
-            'kernel_initializer': initializers.serialize(
-                self.kernel_initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
-            'kernel_regularizer': regularizers.serialize(
-                self.kernel_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'activity_regularizer':
-                regularizers.serialize(self.activity_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint),
+            "filters": self.filters,
+            "kernel_size": self.kernel_size,
+            "strides": self.strides,
+            "padding": self.padding,
+            "data_format": self.data_format,
+            "dilation_rate": self.dilation_rate,
+            "activation": activations.serialize(self.activation),
+            "use_bias": self.use_bias,
+            "kernel_initializer": initializers.serialize(
+                self.kernel_initializer
+            ),
+            "bias_initializer": initializers.serialize(self.bias_initializer),
+            "kernel_regularizer": regularizers.serialize(
+                self.kernel_regularizer
+            ),
+            "bias_regularizer": regularizers.serialize(self.bias_regularizer),
+            "activity_regularizer": regularizers.serialize(
+                self.activity_regularizer
+            ),
+            "kernel_constraint": constraints.serialize(self.kernel_constraint),
+            "bias_constraint": constraints.serialize(self.bias_constraint),
         }
         base_config = super(Conv, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
@@ -446,20 +508,25 @@ class Conv1D(Conv):
 
     """
 
-    def __init__(self, filters, kernel_size, strides=1,
-                 padding='valid',
-                 data_format=None,
-                 dilation_rate=1,
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 activity_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
+    def __init__(
+        self,
+        filters,
+        kernel_size,
+        strides=1,
+        padding="valid",
+        data_format=None,
+        dilation_rate=1,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
         super(Conv1D, self).__init__(
             rank=1,
             filters=filters,
@@ -561,20 +628,25 @@ class Conv2D(Conv):
 
     """
 
-    def __init__(self, filters, kernel_size, strides=1,
-                 padding='valid',
-                 data_format=None,
-                 dilation_rate=1,
-                 activation=None,
-                 use_bias=True,
-                 kernel_initializer='glorot_uniform',
-                 bias_initializer='zeros',
-                 kernel_regularizer=None,
-                 bias_regularizer=None,
-                 activity_regularizer=None,
-                 kernel_constraint=None,
-                 bias_constraint=None,
-                 **kwargs):
+    def __init__(
+        self,
+        filters,
+        kernel_size,
+        strides=1,
+        padding="valid",
+        data_format=None,
+        dilation_rate=1,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
         super(Conv2D, self).__init__(
             rank=2,
             filters=filters,

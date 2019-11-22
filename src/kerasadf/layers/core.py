@@ -1,11 +1,10 @@
-from tensorflow.python.keras.engine.base_layer import Layer, InputSpec
-from tensorflow.python.keras import backend as K
-from tensorflow.python.framework import tensor_shape
-from tensorflow.python.eager import context
-from tensorflow.python.keras import initializers
-from tensorflow.python.keras import constraints
-from tensorflow.python.keras import regularizers
 import numpy as np
+
+from tensorflow.python.eager import context
+from tensorflow.python.framework import tensor_shape
+from tensorflow.python.keras import backend as K
+from tensorflow.python.keras import constraints, initializers, regularizers
+from tensorflow.python.keras.engine.base_layer import InputSpec, Layer
 
 from .. import activations
 
@@ -57,16 +56,17 @@ class ADFLayer(Layer):
         Keyword arguments, passed on to Keras `Layer` base class.
 
     """
-    def __init__(self, mode='diag', **kwargs):
+
+    def __init__(self, mode="diag", **kwargs):
         # check and standardize mode parameter
-        if mode in ['diag', 'diagonal']:
-            mode = 'diag'
-        elif mode in ['lowrank', 'half']:
-            mode = 'half'
-        elif mode in ['full']:
-            mode = 'full'
+        if mode in ["diag", "diagonal"]:
+            mode = "diag"
+        elif mode in ["lowrank", "half"]:
+            mode = "half"
+        elif mode in ["full"]:
+            mode = "full"
         else:
-            raise ValueError('Unknown covariance mode: {}'.format(mode))
+            raise ValueError("Unknown covariance mode: {}".format(mode))
         super(ADFLayer, self).__init__(**kwargs)
         self._mode = mode
 
@@ -75,7 +75,7 @@ class ADFLayer(Layer):
         return self._mode
 
     def get_config(self):
-        config = {'mode': self.mode}
+        config = {"mode": self.mode}
         base_config = super(ADFLayer, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
@@ -98,14 +98,15 @@ class Flatten(ADFLayer):
       If you never set it, then it will be "channels_last".
 
     """
+
     def __init__(self, data_format=None, **kwargs):
         super(Flatten, self).__init__(**kwargs)
         self.data_format = K.normalize_data_format(data_format)
-        if self.mode == 'diag':
+        if self.mode == "diag":
             self.input_spec = [InputSpec(min_ndim=3), InputSpec(min_ndim=3)]
-        elif self.mode == 'half':
+        elif self.mode == "half":
             self.input_spec = [InputSpec(min_ndim=3), InputSpec(min_ndim=4)]
-        elif self.mode == 'full':
+        elif self.mode == "full":
             self.input_spec = [InputSpec(min_ndim=3), InputSpec(min_ndim=5)]
 
     def compute_output_shape(self, input_shape):
@@ -116,12 +117,12 @@ class Flatten(ADFLayer):
             output_shape[0] += [np.prod(input_shape[0][1:])]
         else:
             output_shape[0] += [None]
-        if self.mode == 'diag':
+        if self.mode == "diag":
             if all(input_shape[1][1:]):
                 output_shape[1] += [np.prod(input_shape[1][1:])]
             else:
                 output_shape[1] += [None]
-        elif self.mode == 'half':
+        elif self.mode == "half":
             if input_shape[1][1]:
                 output_shape[1] += [input_shape[1][1]]
             else:
@@ -130,16 +131,20 @@ class Flatten(ADFLayer):
                 output_shape[1] += [np.prod(input_shape[1][2:])]
             else:
                 output_shape[1] += [None]
-        elif self.mode == 'full':
-            if all(input_shape[1][1:(len(input_shape[1])-1)//2+1]):
-                output_shape[1] += [np.prod(
-                    input_shape[1][1:(len(input_shape[1])-1)//2+1])
+        elif self.mode == "full":
+            if all(input_shape[1][1 : (len(input_shape[1]) - 1) // 2 + 1]):
+                output_shape[1] += [
+                    np.prod(
+                        input_shape[1][1 : (len(input_shape[1]) - 1) // 2 + 1]
+                    )
                 ]
             else:
                 output_shape[1] += [None]
-            if all(input_shape[1][(len(input_shape[1])-1)//2+1:]):
-                output_shape[1] += [np.prod(
-                    input_shape[1][(len(input_shape[1])-1)//2+1:])
+            if all(input_shape[1][(len(input_shape[1]) - 1) // 2 + 1 :]):
+                output_shape[1] += [
+                    np.prod(
+                        input_shape[1][(len(input_shape[1]) - 1) // 2 + 1 :]
+                    )
                 ]
             else:
                 output_shape[1] += [None]
@@ -150,59 +155,61 @@ class Flatten(ADFLayer):
         ]
 
     def call(self, inputs):
-        if self.data_format == 'channels_first':
+        if self.data_format == "channels_first":
             permutation = [[0], [0]]
-            permutation[0].extend([i for i in
-                                  range(2, K.ndim(inputs[0]))])
+            permutation[0].extend([i for i in range(2, K.ndim(inputs[0]))])
             permutation[0].append(1)
             inputs[0] = K.permute_dimensions(inputs[0], permutation[0])
-            if self.mode == 'diag':
-                permutation[1].extend([i for i in
-                                      range(2, K.ndim(inputs[1]))])
+            if self.mode == "diag":
+                permutation[1].extend([i for i in range(2, K.ndim(inputs[1]))])
                 permutation[1].append(1)
                 inputs[1] = K.permute_dimensions(inputs[1], permutation[1])
-            elif self.mode == 'half':
+            elif self.mode == "half":
                 permutation[1].append(1)
-                permutation[1].extend([i for i in
-                                      range(3, K.ndim(inputs[1]))])
+                permutation[1].extend([i for i in range(3, K.ndim(inputs[1]))])
                 permutation[1].append(2)
                 inputs[1] = K.permute_dimensions(inputs[1], permutation[1])
-            elif self.mode == 'full':
-                permutation[1].extend([i for i in
-                                      range(2, (K.ndim(inputs[1])-1)//2+1)])
+            elif self.mode == "full":
+                permutation[1].extend(
+                    [i for i in range(2, (K.ndim(inputs[1]) - 1) // 2 + 1)]
+                )
                 permutation[1].append(1)
-                permutation[1].extend([i for i in
-                                      range((K.ndim(inputs[1])-1)//2+2,
-                                            K.ndim(inputs[1]))])
-                permutation[1].append((K.ndim(inputs[1])-1)//2+1)
+                permutation[1].extend(
+                    [
+                        i
+                        for i in range(
+                            (K.ndim(inputs[1]) - 1) // 2 + 2, K.ndim(inputs[1])
+                        )
+                    ]
+                )
+                permutation[1].append((K.ndim(inputs[1]) - 1) // 2 + 1)
                 inputs[1] = K.permute_dimensions(inputs[1], permutation[1])
 
         outputs = [[], []]
-        outputs[0] = K.reshape(inputs[0],
-                                       (K.shape(inputs[0])[0], -1))
-        if self.mode == 'diag':
-            outputs[1] = K.reshape(inputs[1],
-                                           (K.shape(inputs[1])[0], -1))
-        elif self.mode == 'half':
-            outputs[1] = K.reshape(inputs[1],
-                                           (K.shape(inputs[1])[0],
-                                            K.shape(inputs[1])[1], -1))
-        elif self.mode == 'full':
+        outputs[0] = K.reshape(inputs[0], (K.shape(inputs[0])[0], -1))
+        if self.mode == "diag":
+            outputs[1] = K.reshape(inputs[1], (K.shape(inputs[1])[0], -1))
+        elif self.mode == "half":
+            outputs[1] = K.reshape(
+                inputs[1], (K.shape(inputs[1])[0], K.shape(inputs[1])[1], -1)
+            )
+        elif self.mode == "full":
             outputs[1] = K.reshape(
                 inputs[1],
                 (
                     K.shape(inputs[1])[0],
                     K.prod(
                         K.shape(inputs[1])[
-                            1:(K.ndim(inputs[1])-1)//2+1
+                            1 : (K.ndim(inputs[1]) - 1) // 2 + 1
                         ]
                     ),
                     K.prod(
                         K.shape(inputs[1])[
-                            (K.ndim(inputs[1])-1)//2+1:K.ndim(inputs[1])
+                            (K.ndim(inputs[1]) - 1) // 2
+                            + 1 : K.ndim(inputs[1])
                         ]
                     ),
-                )
+                ),
             )
 
         if not context.executing_eagerly():
@@ -214,7 +221,7 @@ class Flatten(ADFLayer):
         return outputs
 
     def get_config(self):
-        config = {'data_format': self.data_format, 'mode': self.mode}
+        config = {"data_format": self.data_format, "mode": self.mode}
         base_config = super(Flatten, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
@@ -267,13 +274,23 @@ class Dense(Layer):
             the output would have shape `(batch_size, units)`.
 
     """
-    def __init__(self, units, activation=None, use_bias=True,
-                 kernel_initializer='glorot_uniform', bias_initializer='zeros',
-                 kernel_regularizer=None, bias_regularizer=None,
-                 activity_regularizer=None, kernel_constraint=None,
-                 bias_constraint=None, **kwargs):
-        if 'input_shape' not in kwargs and 'input_dim' in kwargs:
-            kwargs['input_shape'] = (kwargs.pop('input_dim'),)
+
+    def __init__(
+        self,
+        units,
+        activation=None,
+        use_bias=True,
+        kernel_initializer="glorot_uniform",
+        bias_initializer="zeros",
+        kernel_regularizer=None,
+        bias_regularizer=None,
+        activity_regularizer=None,
+        kernel_constraint=None,
+        bias_constraint=None,
+        **kwargs
+    ):
+        if "input_shape" not in kwargs and "input_dim" in kwargs:
+            kwargs["input_shape"] = (kwargs.pop("input_dim"),)
 
         super(Dense, self).__init__(**kwargs)
         self.units = units
@@ -287,54 +304,58 @@ class Dense(Layer):
         self.bias_constraint = constraints.get(bias_constraint)
         self.supports_masking = False
 
-        if self.mode == 'diag':
+        if self.mode == "diag":
             self.input_spec = [InputSpec(min_ndim=2), InputSpec(min_ndim=2)]
-        elif self.mode == 'half':
+        elif self.mode == "half":
             self.input_spec = [InputSpec(min_ndim=2), InputSpec(min_ndim=3)]
-        elif self.mode == 'full':
+        elif self.mode == "full":
             self.input_spec = [InputSpec(min_ndim=2), InputSpec(min_ndim=3)]
 
     def build(self, input_shape):
         input_shape[0] = tensor_shape.TensorShape(input_shape[0])
         input_shape[1] = tensor_shape.TensorShape(input_shape[1])
-        if (input_shape[0][-1].value is None
-                or input_shape[1][-1].value is None):
-            raise ValueError('The last dimension of the inputs to `Dense` '
-                             'should be defined. Found `None`.')
+        if (
+            input_shape[0][-1].value is None
+            or input_shape[1][-1].value is None
+        ):
+            raise ValueError(
+                "The last dimension of the inputs to `Dense` "
+                "should be defined. Found `None`."
+            )
         last_dim = input_shape[0][-1].value
-        if self.mode == 'diag':
+        if self.mode == "diag":
             self.input_spec = [
                 InputSpec(min_ndim=2, axes={-1: last_dim}),
                 InputSpec(min_ndim=2, axes={-1: last_dim}),
             ]
-        elif self.mode == 'half':
+        elif self.mode == "half":
             self.input_spec = [
                 InputSpec(min_ndim=2, axes={-1: last_dim}),
                 InputSpec(min_ndim=3, axes={-1: last_dim}),
             ]
-        elif self.mode == 'full':
+        elif self.mode == "full":
             self.input_spec = [
                 InputSpec(min_ndim=2, axes={-1: last_dim}),
                 InputSpec(min_ndim=3, axes={-1: last_dim, -2: last_dim}),
             ]
         self.kernel = self.add_weight(
-            'kernel',
+            "kernel",
             shape=[last_dim, self.units],
             initializer=self.kernel_initializer,
             regularizer=self.kernel_regularizer,
             constraint=self.kernel_constraint,
             dtype=self.dtype,
-            trainable=True
+            trainable=True,
         )
         if self.use_bias:
             self.bias = self.add_weight(
-                'bias',
-                shape=[self.units, ],
+                "bias",
+                shape=[self.units],
                 initializer=self.bias_initializer,
                 regularizer=self.bias_regularizer,
                 constraint=self.bias_constraint,
                 dtype=self.dtype,
-                trainable=True
+                trainable=True,
             )
         else:
             self.bias = None
@@ -343,11 +364,11 @@ class Dense(Layer):
     def call(self, inputs):
         means, covariances = inputs
         outmeans = K.dot(means, self.kernel)
-        if self.mode == 'diag':
+        if self.mode == "diag":
             outcovariances = K.dot(covariances, K.square(self.kernel))
-        elif self.mode == 'half':
+        elif self.mode == "half":
             outcovariances = K.dot(covariances, self.kernel)
-        elif self.mode == 'full':
+        elif self.mode == "full":
             outcovariances = K.dot(covariances, self.kernel)
             outcovariances = K.dot(K.transpose(self.kernel), outcovariances)
         if self.use_bias:
@@ -360,31 +381,35 @@ class Dense(Layer):
         input_shape[0] = tensor_shape.TensorShape(input_shape[0])
         input_shape[1] = tensor_shape.TensorShape(input_shape[1])
         input_shape[0] = input_shape[0].with_rank_at_least(2)
-        if self.mode == 'diag':
+        if self.mode == "diag":
             input_shape[1] = input_shape[1].with_rank_at_least(2)
-        elif self.mode == 'half':
+        elif self.mode == "half":
             input_shape[1] = input_shape[1].with_rank_at_least(3)
-        elif self.mode == 'full':
+        elif self.mode == "full":
             input_shape[1] = input_shape[1].with_rank_at_least(3)
         if input_shape[0][-1].value is None:
             raise ValueError(
-                'The innermost dimension of input_shape must be defined, '
-                'but saw: %s' % input_shape[0])
+                "The innermost dimension of input_shape must be defined, "
+                "but saw: %s" % input_shape[0]
+            )
         if input_shape[1][-1].value is None:
             raise ValueError(
-                'The innermost dimension of input_shape must be defined, '
-                'but saw: %s' % input_shape[1])
-        if ((self.mode == 'full' or self.mode == 'half')
-                and input_shape[1][-2].value is None):
+                "The innermost dimension of input_shape must be defined, "
+                "but saw: %s" % input_shape[1]
+            )
+        if (self.mode == "full" or self.mode == "half") and input_shape[1][
+            -2
+        ].value is None:
             raise ValueError(
-                'The two innermost dimension of input_shape must be defined '
-                'for modes "full" or "half", but saw: %s' % input_shape[1])
-        if self.mode == 'diag' or self.mode == 'half':
+                "The two innermost dimension of input_shape must be defined "
+                'for modes "full" or "half", but saw: %s' % input_shape[1]
+            )
+        if self.mode == "diag" or self.mode == "half":
             return [
                 input_shape[0][:-1].concatenate(self.units),
                 input_shape[1][:-1].concatenate(self.units),
             ]
-        elif self.mode == 'full':
+        elif self.mode == "full":
             return [
                 input_shape[0][:-1].concatenate(self.units),
                 input_shape[1][:-2].concatenate([self.units, self.units]),
@@ -392,19 +417,22 @@ class Dense(Layer):
 
     def get_config(self):
         config = {
-            'units': self.units,
-            'activation': activations.serialize(self.activation),
-            'use_bias': self.use_bias,
-            'kernel_initializer': initializers.serialize(
-                self.kernel_initializer),
-            'bias_initializer': initializers.serialize(self.bias_initializer),
-            'kernel_regularizer': regularizers.serialize(
-                self.kernel_regularizer),
-            'bias_regularizer': regularizers.serialize(self.bias_regularizer),
-            'activity_regularizer':
-                regularizers.serialize(self.activity_regularizer),
-            'kernel_constraint': constraints.serialize(self.kernel_constraint),
-            'bias_constraint': constraints.serialize(self.bias_constraint),
+            "units": self.units,
+            "activation": activations.serialize(self.activation),
+            "use_bias": self.use_bias,
+            "kernel_initializer": initializers.serialize(
+                self.kernel_initializer
+            ),
+            "bias_initializer": initializers.serialize(self.bias_initializer),
+            "kernel_regularizer": regularizers.serialize(
+                self.kernel_regularizer
+            ),
+            "bias_regularizer": regularizers.serialize(self.bias_regularizer),
+            "activity_regularizer": regularizers.serialize(
+                self.activity_regularizer
+            ),
+            "kernel_constraint": constraints.serialize(self.kernel_constraint),
+            "bias_constraint": constraints.serialize(self.bias_constraint),
         }
         base_config = super(Dense, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
