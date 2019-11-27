@@ -37,12 +37,13 @@ CLASSIFIERS = [
     "Topic :: Scientific/Engineering :: Mathematics",
     "Private :: Do Not Upload",  # safeguard - remove for actual packages
 ]
-INSTALL_REQUIRES = ["tensorflow"]
+INSTALL_REQUIRES = ["tensorflow<=1.15", "numpy"]  # TF 2.0 not yet supported
 EXTRAS_REQUIRE = {
     "docs": ["sphinx>=1.6.5", "numpydoc"],  # numpydoc needs sphinx 1.6.5+
     "tests": [
         "coverage",
         "hypothesis[numpy]",
+        "scipy",
         "pytest>=4.3.0",  # 4.3.0 dropped last use of `convert`
     ],
 }

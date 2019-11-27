@@ -226,7 +226,7 @@ class Flatten(ADFLayer):
         return dict(list(base_config.items()) + list(config.items()))
 
 
-class Dense(Layer):
+class Dense(ADFLayer):
     """Densly-connected (fully connected) neural network layer.
 
     Assumed Density Filtering (ADF) version of the Keras `Dense` layer.
@@ -291,7 +291,6 @@ class Dense(Layer):
     ):
         if "input_shape" not in kwargs and "input_dim" in kwargs:
             kwargs["input_shape"] = (kwargs.pop("input_dim"),)
-
         super(Dense, self).__init__(**kwargs)
         self.units = units
         self.activation = activations.get(activation)

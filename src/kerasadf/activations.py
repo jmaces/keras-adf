@@ -1,18 +1,19 @@
 import numpy as np
 import six
+import tensorflow as tf
 
 from tensorflow.python.keras import backend as K
-from tensorflow.python.ops import array_ops, math_ops
+from tensorflow.python.ops import array_ops
 
 
 # private helper function for relu, pdf of standard normal distribution
 def _gauss_density(x):
-    return 1 / np.sqrt(2 * np.pi) * K.exp(-K.square(x) / 2)
+    return K.cast(1 / np.sqrt(2 * np.pi) * K.exp(-K.square(x) / 2), x.dtype)
 
 
 # private helper function for relu, cdf of standard normal distribution
 def _gauss_cumulative(x):
-    return 1 / 2 * (1 + math_ops.erf(x / np.sqrt(2)))
+    return K.cast(1 / 2 * (1 + tf.math.erf(x / np.sqrt(2))), x.dtype)
 
 
 def relu(x, alpha=0.0, max_value=None, threshold=0.0, mode="diag"):
@@ -67,6 +68,7 @@ def relu(x, alpha=0.0, max_value=None, threshold=0.0, mode="diag"):
     means_rank = len(means_shape)
     cov_shape = covariances.get_shape().as_list()
     cov_rank = len(cov_shape)
+    EPS = K.cast(K.epsilon(), covariances.dtype)
     # treat inputs according to rank and mode
     if means_rank == 1:
         # if rank(mean)=1, treat as single vector, no reshapes necessary
@@ -92,38 +94,47 @@ def relu(x, alpha=0.0, max_value=None, threshold=0.0, mode="diag"):
                 + [K.prod(cov_shape[1 : (cov_rank - 1) // 2 + 1])]
                 + [K.prod(cov_shape[(cov_rank - 1) // 2 + 1 :])],
             )
-
     if mode == "diag":
-        covariances = covariances + K.epsilon()
+        covariances = covariances + EPS
         std = K.sqrt(covariances)
         div = means / std
         gd_div = _gauss_density(div)
         gc_div = _gauss_cumulative(div)
-        new_means = means * gc_div + std * gd_div
+        new_means = K.maximum(
+            means,
+            K.maximum(K.zeros_like(means), means * gc_div + std * gd_div),
+        )
         new_covariances = (
-            (K.square(means) + covariances) * gc_div
+            K.square(means) * gc_div
+            + covariances * gc_div
             + means * std * gd_div
             - K.square(new_means)
         )
-        new_covariances = K.maximum(0.0, new_covariances)
-    elif mode == "half":
-        variances = (
-            math_ops.reduce_sum(K.square(covariances), axis=1) + K.epsilon()
+        new_covariances = K.maximum(
+            K.zeros_like(new_covariances), new_covariances
         )
+    elif mode == "half":
+        variances = K.sum(K.square(covariances), axis=1) + EPS
         std = K.sqrt(variances)
         div = means / std
         gd_div = _gauss_density(div)
         gc_div = _gauss_cumulative(div)
-        new_means = means * gc_div + std * gd_div
+        new_means = K.maximum(
+            means,
+            K.maximum(K.zeros_like(means), means * gc_div + std * gd_div),
+        )
         gc_div = K.expand_dims(gc_div, 1)
         new_covariances = covariances * gc_div
     elif mode == "full":
-        variances = array_ops.matrix_diag_part(covariances) + 1e-7
+        variances = array_ops.matrix_diag_part(covariances) + EPS
         std = K.sqrt(variances)
         div = means / std
         gd_div = _gauss_density(div)
         gc_div = _gauss_cumulative(div)
-        new_means = means * gc_div + std * gd_div
+        new_means = K.maximum(
+            means,
+            K.maximum(K.zeros_like(means), means * gc_div + std * gd_div),
+        )
         gc_div = K.expand_dims(gc_div, 1)
         new_covariances = covariances * gc_div
         new_covariances = K.permute_dimensions(new_covariances, [0, 2, 1])
