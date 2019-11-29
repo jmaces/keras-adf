@@ -308,7 +308,7 @@ class AveragePooling1D(Pooling1D):
         **kwargs
     ):
         super(AveragePooling1D, self).__init__(
-            nn.avg_pool,
+            nn.avg_pool,  # no 1d pooling until tf-1.14, we use 2d instead
             pool_size=pool_size,
             strides=strides,
             padding=padding,
@@ -320,29 +320,52 @@ class AveragePooling1D(Pooling1D):
         input_shapes = nest.map_structure(lambda x: x.shape, inputs)
         output_shapes = self.compute_output_shape(input_shapes)
         means, covariances = inputs
+        # there is no 1d pooling until tf-1.14, so we use 2d pooling instead
         if self.data_format == "channels_last":
-            pool_shape = (1,) + self.pool_size + (1,)
-            strides = (1,) + self.strides + (1,)
+            means = K.expand_dims(means, 1)
+            if self.mode == "diag":
+                covariances = K.expand_dims(covariances, 1)
+            elif self.mode == "half":
+                covariances = K.expand_dims(covariances, 2)
+            elif self.mode == "full":
+                covariances = K.expand_dims(covariances, 1)
+                covariances = K.expand_dims(covariances, 4)
+            pool_shape = list((1,) + self.pool_size)
+            strides = list((1,) + self.strides)
+            data_format = "NHWC"
         else:
-            pool_shape = (1, 1) + self.pool_size
-            strides = (1, 1) + self.strides
+            means = K.expand_dims(means, 2)
+            if self.mode == "diag":
+                covariances = K.expand_dims(covariances, 2)
+            elif self.mode == "half":
+                covariances = K.expand_dims(covariances, 3)
+            elif self.mode == "full":
+                covariances = K.expand_dims(covariances, 2)
+                covariances = K.expand_dims(covariances, 5)
+            pool_shape = list((1,) + self.pool_size)
+            strides = list((1,) + self.strides)
+            data_format = "NCHW"
         outputs = [[], []]
-        outputs[0] = self.pool_function(
-            means,
-            ksize=pool_shape,
-            strides=strides,
-            padding=self.padding.upper(),
-            data_format=conv_utils.convert_data_format(self.data_format, 3),
-        )
-        if self.mode == "diag":
-            outputs[1] = self.pool_function(
-                covariances / np.prod(pool_shape),
+        outputs[0] = K.reshape(
+            self.pool_function(
+                means,
                 ksize=pool_shape,
                 strides=strides,
                 padding=self.padding.upper(),
-                data_format=conv_utils.convert_data_format(
-                    self.data_format, 3
+                data_format=data_format,
+            ),
+            [-1] + output_shapes[0].as_list()[1:],
+        )
+        if self.mode == "diag":
+            outputs[1] = K.reshape(
+                self.pool_function(
+                    covariances / np.prod(pool_shape),
+                    ksize=pool_shape,
+                    strides=strides,
+                    padding=self.padding.upper(),
+                    data_format=data_format,
                 ),
+                [-1] + output_shapes[1].as_list()[1:],
             )
         elif self.mode == "half":
             cov_shape = covariances.get_shape().as_list()
@@ -353,49 +376,51 @@ class AveragePooling1D(Pooling1D):
                     ksize=pool_shape,
                     strides=strides,
                     padding=self.padding.upper(),
-                    data_format=conv_utils.convert_data_format(
-                        self.data_format, 3
-                    ),
+                    data_format=data_format,
                 ),
                 [-1] + output_shapes[1].as_list()[1:],
             )
         elif self.mode == "full":
             cov_shape = covariances.get_shape().as_list()
-            covariances = K.reshape(covariances, [-1] + cov_shape[3:])
+            out_shape = output_shapes[1].as_list()
+            if self.data_format == "channels_last":
+                out_shape = (
+                    out_shape[:1] + [1] + out_shape[1:3] + [1] + out_shape[3:]
+                )
+            elif self.data_format == "channels_first":
+                out_shape = (
+                    out_shape[:2] + [1] + out_shape[2:4] + [1] + out_shape[4:]
+                )
+            covariances = K.reshape(covariances, [-1] + cov_shape[4:])
             covariances = K.reshape(
                 self.pool_function(
                     covariances,
                     ksize=pool_shape,
                     strides=strides,
                     padding=self.padding.upper(),
-                    data_format=conv_utils.convert_data_format(
-                        self.data_format, 3
-                    ),
+                    data_format=data_format,
                 ),
-                ([-1] + cov_shape[1:3] + output_shapes[1].as_list()[-2:]),
+                ([-1] + cov_shape[1:4] + out_shape[-3:]),
             )
             covariances = K.permute_dimensions(
-                covariances, ([0] + list(range(3, 5)) + list(range(1, 3))),
+                covariances, ([0] + list(range(4, 7)) + list(range(1, 4))),
             )
-            covariances = K.reshape(covariances, [-1] + cov_shape[1:3])
+            covariances = K.reshape(covariances, [-1] + cov_shape[1:4])
             covariances = K.reshape(
                 self.pool_function(
                     covariances,
                     ksize=pool_shape,
                     strides=strides,
                     padding=self.padding.upper(),
-                    data_format=conv_utils.convert_data_format(
-                        self.data_format, 3
-                    ),
+                    data_format=data_format,
                 ),
-                (
-                    [-1]
-                    + output_shapes[1].as_list()[-2:]
-                    + output_shapes[1].as_list()[1:3]
-                ),
+                ([-1] + out_shape[-3:] + out_shape[1:4]),
             )
-            outputs[1] = K.permute_dimensions(
-                covariances, ([0] + list(range(3, 5)) + list(range(1, 3))),
+            outputs[1] = K.reshape(
+                K.permute_dimensions(
+                    covariances, ([0] + list(range(4, 7)) + list(range(1, 4))),
+                ),
+                [-1] + output_shapes[1].as_list()[1:],
             )
         return outputs
 
@@ -782,11 +807,11 @@ class AveragePooling2D(Pooling2D):
         output_shapes = self.compute_output_shape(input_shapes)
         means, covariances = inputs
         if self.data_format == "channels_last":
-            pool_shape = (1,) + self.pool_size + (1,)
-            strides = (1,) + self.strides + (1,)
+            pool_shape = list(self.pool_size)
+            strides = list(self.strides)
         else:
-            pool_shape = (1, 1) + self.pool_size
-            strides = (1, 1) + self.strides
+            pool_shape = list(self.pool_size)
+            strides = list(self.strides)
         outputs = [[], []]
         outputs[0] = self.pool_function(
             means,
