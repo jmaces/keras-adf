@@ -5,6 +5,7 @@ from tensorflow.python.framework import tensor_shape
 from tensorflow.python.keras import backend as K
 from tensorflow.python.keras import constraints, initializers, regularizers
 from tensorflow.python.keras.engine.base_layer import InputSpec, Layer
+from tensorflow.python.keras.utils import conv_utils
 
 from .. import activations
 
@@ -101,7 +102,7 @@ class Flatten(ADFLayer):
 
     def __init__(self, data_format=None, **kwargs):
         super(Flatten, self).__init__(**kwargs)
-        self.data_format = K.normalize_data_format(data_format)
+        self.data_format = conv_utils.normalize_data_format(data_format)
         if self.mode == "diag":
             self.input_spec = [InputSpec(min_ndim=3), InputSpec(min_ndim=3)]
         elif self.mode == "half":
@@ -148,7 +149,6 @@ class Flatten(ADFLayer):
                 ]
             else:
                 output_shape[1] += [None]
-
         return [
             tensor_shape.TensorShape(output_shape[0]),
             tensor_shape.TensorShape(output_shape[1]),
@@ -184,7 +184,6 @@ class Flatten(ADFLayer):
                 )
                 permutation[1].append((K.ndim(inputs[1]) - 1) // 2 + 1)
                 inputs[1] = K.permute_dimensions(inputs[1], permutation[1])
-
         outputs = [[], []]
         outputs[0] = K.reshape(inputs[0], (K.shape(inputs[0])[0], -1))
         if self.mode == "diag":
@@ -221,7 +220,7 @@ class Flatten(ADFLayer):
         return outputs
 
     def get_config(self):
-        config = {"data_format": self.data_format, "mode": self.mode}
+        config = {"data_format": self.data_format}
         base_config = super(Flatten, self).get_config()
         return dict(list(base_config.items()) + list(config.items()))
 
@@ -369,7 +368,13 @@ class Dense(ADFLayer):
             outcovariances = K.dot(covariances, self.kernel)
         elif self.mode == "full":
             outcovariances = K.dot(covariances, self.kernel)
-            outcovariances = K.dot(K.transpose(self.kernel), outcovariances)
+            perm = list(range(K.ndim(covariances) - 2)) + [
+                K.ndim(covariances) - 1,
+                K.ndim(covariances) - 2,
+            ]
+            outcovariances = K.permute_dimensions(outcovariances, perm)
+            outcovariances = K.dot(outcovariances, self.kernel)
+            # outcovariances = K.permute_dimensions(outcovariances, perm)
         if self.use_bias:
             outmeans = K.bias_add(outmeans, self.bias)
         if self.activation is not None:

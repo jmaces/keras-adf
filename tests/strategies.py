@@ -7,7 +7,6 @@ from hypothesis import assume
 
 
 # constants for various tests
-ALL_ACTIVATIONS = ["linear", "relu"]
 COVARIANCE_MODES = ["diag", "half", "full"]
 
 
@@ -73,7 +72,13 @@ def clean_floats(min_value=-1e15, max_value=1e15, width=32):
 
 @st.composite
 def batched_float_array(
-    draw, min_batch_size=None, min_data_dims=1, min_data_size=None
+    draw,
+    min_batch_size=None,
+    max_batch_size=None,
+    min_data_dims=1,
+    max_data_dims=None,
+    min_data_size=None,
+    max_data_size=None,
 ):
     """Float array strategy for different covariance modes.
 
@@ -83,8 +88,8 @@ def batched_float_array(
     the remaining for the true data dimensions).
     Content can be any floating point data type.
 
-    A minimum size for the batch dimension, the number of data dimensions and
-    the product of all data dimensions can be specified respectively.
+    A minimum and maximum size for the batch dimension, the number of data
+    dimensions and product of data dimensions can be specified respectively.
 
     Yields tuples (means, covariacnes, mode).
     """
@@ -92,11 +97,22 @@ def batched_float_array(
     dtype = draw(hnp.floating_dtypes())
     bytes = dtype.itemsize
     bits = 8 * bytes
-    shape = draw(hnp.array_shapes(min_dims=1 + min_data_dims))
+    if max_data_dims is not None:
+        shape = draw(
+            hnp.array_shapes(
+                min_dims=1 + min_data_dims, max_dims=1 + max_data_dims
+            )
+        )
+    else:
+        shape = draw(hnp.array_shapes(min_dims=1 + min_data_dims))
     if min_batch_size is not None:
         assume(shape[0] >= min_batch_size)
+    if max_batch_size is not None:
+        assume(shape[0] <= max_batch_size)
     if min_data_size is not None:
         assume(np.prod(shape[1:]) >= min_data_size)
+    if max_data_size is not None:
+        assume(np.prod(shape[1:]) <= max_data_size)
     means_ar = hnp.arrays(
         dtype,
         shape,
