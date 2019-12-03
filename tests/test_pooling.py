@@ -1,4 +1,4 @@
-"""Tests for `kerasadf.layers.core`. """
+"""Tests for `kerasadf.layers.pooling`. """
 import hypothesis.strategies as st
 import numpy as np
 import pytest

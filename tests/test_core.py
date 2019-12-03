@@ -1,6 +1,4 @@
 """Tests for `kerasadf.layers.core`. """
-# import numpy as np
-
 import hypothesis.strategies as st
 
 from hypothesis import given, settings
@@ -8,13 +6,9 @@ from tensorflow.python.keras import backend as K
 from tensorflow.python.keras.layers import Input
 from tensorflow.python.keras.models import Model
 
-# import kerasadf.activations
 import kerasadf.layers
 
-from .strategies import assert_eq, batched_float_array  # assert_leq,
-
-
-# import pytest
+from .strategies import assert_eq, batched_float_array
 
 
 # core layer tests
