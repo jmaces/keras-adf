@@ -1,7 +1,11 @@
 """Tensorflow/Keras implementation of Assumed Density Filtering (ADF) based
 probabilistic neural networks.
 
-TODO
+This package provides implementations of several ADF based probabilistic
+buildings blocks commonly used in neural networks. They are to be used within
+the framework of Tesorflow/Keras. Unlike standard (deterministic) Keras layers
+that propagate point estimates, the corresponding probabilsitic ADF layers
+propagate a distribution parametrized by its mean and (co-)variance.
 
 """
 from __future__ import absolute_import, division, print_function

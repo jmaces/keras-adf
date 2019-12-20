@@ -13,7 +13,8 @@ from .. import activations
 class ADFLayer(Layer):
     """Abstract base class for Assumed Density Filtering layers.
 
-    Derived from the Keras Layer base class and offers the same functionality.
+    Derived from `tensorflow.python.keras.engine.base_layer.Layer` and it
+    offers mostly the same functionality.
     It adds one additional required argument for all ADF layers, namely the
     mode of the probability distribution propagation through the layer.
 
@@ -26,18 +27,18 @@ class ADFLayer(Layer):
 
     Available modes are:
 
-    1. `diag` or `diagonal`, meaning that nodes within a layer are considered
+    1. "diag" or "diagonal", meaning that nodes within a layer are considered
     statistically independent and only variances (but no covariances) are
     propagated. This amounts to propagating only the diagonal of the covariance
     matrix through the layer.
 
-    2. `lowrank` or `half`, meaning that nodes within a layer are considered
+    2. "lowrank" or "half", meaning that nodes within a layer are considered
     statistically dependent and variances as well as covariances are
     propagated. However, instead of the full covariance matrix only one half
     of a symmetric low-rank factorization of it is propagated for computational
     benefits.
 
-    3. `full`, meaning that nodes within a layer are considered statistically
+    3. "full", meaning that nodes within a layer are considered statistically
     dependent and variances as well as covariances are propagated. The full
     covariance matrix is propagated in this mode, which results in a huge
     memory requirement. Therefore, the full covariance mode is often infeasible
@@ -46,15 +47,15 @@ class ADFLayer(Layer):
 
     Attributes
     ----------
-    mode : {'diag', 'half', 'full'}
+    mode : {"diag", "half", "full"}
         Covariance propagation mode.
 
     Parameters
     ----------
-    mode : {'diag', 'diagonal', 'lowrank', 'half', 'full'}, optional
-        Covariance propagation mode. The default mode is `diag`.
+    mode : {"diag", "diagonal", "lowrank", "half", "full"}, optional
+        Covariance propagation mode. The default mode is "diag".
     **kwargs
-        Keyword arguments, passed on to Keras `Layer` base class.
+        Keyword arguments, passed on to Keras ``Layer`` base class.
 
     """
 
@@ -84,20 +85,19 @@ class ADFLayer(Layer):
 class Flatten(ADFLayer):
     """Flattens the input. Does not affect the batch size.
 
-    Assumed Density Filtering (ADF) version of the Keras `Flatten` layer.
+    Assumed Density Filtering (ADF) version of `keras.layers.Flatten`.
+
 
     Parameters
     ----------
-    data_format {'channels_last', 'channels_first'}, optional
-      one of `channels_last` (default) or `channels_first`.
-      The ordering of the dimensions in the inputs.
-      `channels_last` corresponds to inputs with shape
-      `(batch, ..., channels)` while `channels_first` corresponds to
-      inputs with shape `(batch, channels, ...)`.
-      It defaults to the `image_data_format` value found in your
-      Keras config file at `~/.keras/keras.json`.
-      If you never set it, then it will be "channels_last".
-
+    data_format : {"channels_last", "channels_first"}, optional
+        The ordering of the dimensions in the inputs.
+        "channels_last" corresponds to inputs with shape
+        ``(batch, ..., channels)`` while "channels_first" corresponds
+        to inputs with shape ``(batch, channels, ...)``.
+        It defaults to the ``image_data_format`` value found in your
+        Keras config file at ``~/.keras/keras.json``.
+        If you never set it, then it will be "channels_last".
     """
 
     def __init__(self, data_format=None, **kwargs):
@@ -228,7 +228,7 @@ class Flatten(ADFLayer):
 class Dense(ADFLayer):
     """Densly-connected (fully connected) neural network layer.
 
-    Assumed Density Filtering (ADF) version of the Keras `Dense` layer.
+    Assumed Density Filtering (ADF) version of `keras.layers.Dense`.
 
     Parameters
     ----------
@@ -236,41 +236,42 @@ class Dense(ADFLayer):
         Dimensionality of the output space (number of neurons).
     activation : callable or string, optional
         Activation function to use. Default is no activation
-        (ie. "linear" activation: `a(x) = x`).
+        (ie. "linear" activation: ``a(x) = x``).
     use_bias : bool
         Whether the layer uses a bias vector.
     kernel_initializer : Initializer or string, optional
-        Initializer for the `kernel` weights matrix.
-        Default is `glorot_uniform` initialization.
+        Initializer for the ``kernel`` weights matrix.
+        Default is ``glorot_uniform`` initialization.
     bias_initializer : Initializer or string, optional
         Initializer for the bias vector. Default is `None`.
     kernel_regularizer : Regularizer or string, optional
-        Regularizer function applied to the `kernel` weights matrix.
+        Regularizer function applied to the ``kernel`` weights matrix.
         Default is `None`.
-    bias_regularizer : Regulairzer or string, optional
+    bias_regularizer : Regularizer or string, optional
         Regularizer function applied to the bias vector.
         Default is `None`.
     activity_regularizer : Regularizer or string, optional
         Regularizer function applied to the output of the layer.
         Default is `None`.
-    kernel_constraint: Constraint or string, optional
-        Constraint function applied to the `kernel` weights matrix.
+    kernel_constraint : Constraint or string, optional
+        Constraint function applied to the ``kernel`` weights matrix.
         Default is `None`.
-    bias_constraint: Constraint or string, optional
+    bias_constraint : Constraint or string, optional
         Constraint function applied to the bias vector.
         Default is `None`.
 
+
     Notes
     -----
-    Input shape:
-        nD tensor with shape: `(batch_size, ..., input_dim)`.
-            The most common situation would be
-            a 2D input with shape `(batch_size, input_dim)`.
+    Input shape
+        nD tensor with shape: ``(batch_size, ..., input_dim)``.
+        The most common situation would be a 2D input with shape
+        ``(batch_size, input_dim)``.
 
-    Output shape:
-        nD tensor with shape: `(batch_size, ..., units)`.
-            For instance, for a 2D input with shape `(batch_size, input_dim)`,
-            the output would have shape `(batch_size, units)`.
+    Output shape
+        nD tensor with shape: ``(batch_size, ..., units)``.
+        For instance, for a 2D input with shape ``(batch_size, input_dim)``,
+        the output would have shape ``(batch_size, units)``.
 
     """
 

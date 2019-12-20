@@ -13,30 +13,31 @@ from .core import ADFLayer
 class Pooling1D(ADFLayer):
     """Pooling layer for arbitrary pooling functions, for 1D inputs.
 
-    Assumed Density Filtering (ADF) version of the Keras `Pooling1D` layer.
+    Assumed Density Filtering (ADF) version of the abstract Keras ``Pooling1D``
+    layer.
 
     This class only exists for code reuse. It will never be an exposed API.
 
     Parameters
     ----------
     pool_function : callable
-        The pooling function to apply, e.g. `tf.nn.max_pool2d`.
+        The pooling function to apply, e.g. ``tf.nn.max_pool2d``.
     pool_size : int or tuple of int
         An integer or tuple/list of a single integer, representing the size of
         the pooling window.
     strides : int or tuple of int or `None`, optional
         An integer or tuple/list of a single integer, specifying the strides of
-        the pooling operation. If `None`, the `pool_size` will be used.
+        the pooling operation. If `None`, the ``pool_size`` will be used.
         Default is `None`.
     padding : {"valid", "same"}, optional
         The padding method. Case-insensitive. Default is "valid".
     data_format : {"channels_last", "channels_first"}, optional
         The ordering of the dimensions in the inputs.
-        `channels_last` corresponds to inputs with shape
-        `(batch, steps, features)` while `channels_first` corresponds to
-        inputs with shape `(batch, features, steps)`.
-        It defaults to the `image_data_format` value found in your
-        Keras config file at `~/.keras/keras.json`.
+        "channels_last" corresponds to inputs with shape
+        ``(batch, steps, features)`` while "channels_first" corresponds to
+        inputs with shape ``(batch, features, steps)``.
+        It defaults to the ``image_data_format`` value found in your
+        Keras config file at ``~/.keras/keras.json``.
         If you never set it, then it will be "channels_last".
     """
 
@@ -191,7 +192,7 @@ class Pooling1D(ADFLayer):
 class MaxPooling1D(Pooling1D):
     """Max pooling layer for 1D inputs.
 
-    Assumed Density Filtering (ADF) version of the Keras `MaxPooling2D` layer.
+    Assumed Density Filtering (ADF) version of `keras.layers.MaxPooling1D`.
 
     Parameters
     ----------
@@ -200,36 +201,33 @@ class MaxPooling1D(Pooling1D):
         the pooling window. Default is 2.
     strides : int or tuple of int or `None`, optional
         An integer or tuple/list of a single integer, specifying the strides of
-        the pooling operation. If `None`, the `pool_size` will be used.
+        the pooling operation. If `None`, the ``pool_size`` will be used.
         Default is `None`.
     padding : {"valid", "same"}, optional
         The padding method. Case-insensitive. Default is "valid".
     data_format : {"channels_last", "channels_first"}, optional
         The ordering of the dimensions in the inputs.
-        `channels_last` corresponds to inputs with shape
-        `(batch, steps, features)` while `channels_first` corresponds to
-        inputs with shape `(batch, features, steps)`.
-        It defaults to the `image_data_format` value found in your
-        Keras config file at `~/.keras/keras.json`.
+        "channels_last" corresponds to inputs with shape
+        ``(batch, steps, features)`` while "channels_first" corresponds to
+        inputs with shape ``(batch, features, steps)``.
+        It defaults to the ``image_data_format`` value found in your
+        Keras config file at ``~/.keras/keras.json``.
         If you never set it, then it will be "channels_last".
+
 
     Notes
     -----
-    Input shape:
-        - If `data_format='channels_last'`:
-            3D tensor with shape:
-            `(batch_size, steps, features)`
-        - If `data_format='channels_first'`:
-            3D tensor with shape:
-            `(batch_size, features, steps)`
+    Input shape
+        3D tensor with shape ``(batch_size, steps, features)`` if
+        ``data_format`` is "channels_last" or shape
+        ``(batch_size, features, steps)`` if ``data_format`` is
+        "channels_first".
 
-    Output shape:
-        - If `data_format='channels_last'`:
-            3D tensor with shape:
-            `(batch_size, pooled_steps, features)`
-        - If `data_format='channels_first'`:
-            3D tensor with shape:
-            `(batch_size, features, pooled_steps)`
+    Output shape
+        3D tensor with shape ``(batch_size, pooled_steps, features)`` if
+        ``data_format`` is "channels_last" or shape
+        ``(batch_size, features, pooled_steps)`` if ``data_format`` is
+        "channels_first".
     """
 
     def __init__(
@@ -256,9 +254,9 @@ class MaxPooling1D(Pooling1D):
 
 
 class AveragePooling1D(Pooling1D):
-    """Max pooling layer for 1D inputs.
+    """Average pooling layer for 1D inputs.
 
-    Assumed Density Filtering (ADF) version of the Keras `MaxPooling2D` layer.
+    Assumed Density Filtering (ADF) version of `keras.layers.AveragePooling1D`.
 
     Parameters
     ----------
@@ -267,36 +265,33 @@ class AveragePooling1D(Pooling1D):
         the pooling window. Default is 2.
     strides : int or tuple of int or `None`, optional
         An integer or tuple/list of a single integer, specifying the strides of
-        the pooling operation. If `None`, the `pool_size` will be used.
+        the pooling operation. If `None`, the ``pool_size`` will be used.
         Default is `None`.
     padding : {"valid", "same"}, optional
         The padding method. Case-insensitive. Default is "valid".
     data_format : {"channels_last", "channels_first"}, optional
         The ordering of the dimensions in the inputs.
-        `channels_last` corresponds to inputs with shape
-        `(batch, steps, features)` while `channels_first` corresponds to
-        inputs with shape `(batch, features, steps)`.
-        It defaults to the `image_data_format` value found in your
-        Keras config file at `~/.keras/keras.json`.
+        "channels_last" corresponds to inputs with shape
+        ``(batch, steps, features)`` while "channels_first" corresponds to
+        inputs with shape ``(batch, features, steps)``.
+        It defaults to the ``image_data_format`` value found in your
+        Keras config file at ``~/.keras/keras.json``.
         If you never set it, then it will be "channels_last".
+
 
     Notes
     -----
-    Input shape:
-        - If `data_format='channels_last'`:
-            3D tensor with shape:
-            `(batch_size, steps, features)`
-        - If `data_format='channels_first'`:
-            3D tensor with shape:
-            `(batch_size, features, steps)`
+    Input shape
+        3D tensor with shape ``(batch_size, steps, features)`` if
+        ``data_format`` is "channels_last" or shape
+        ``(batch_size, features, steps)`` if ``data_format`` is
+        "channels_first".
 
-    Output shape:
-        - If `data_format='channels_last'`:
-            3D tensor with shape:
-            `(batch_size, pooled_steps, features)`
-        - If `data_format='channels_first'`:
-            3D tensor with shape:
-            `(batch_size, features, pooled_steps)`
+    Output shape
+        3D tensor with shape ``(batch_size, pooled_steps, features)`` if
+        ``data_format`` is "channels_last" or shape
+        ``(batch_size, features, pooled_steps)`` if ``data_format`` is
+        "channels_first".
     """
 
     def __init__(
@@ -428,32 +423,33 @@ class AveragePooling1D(Pooling1D):
 class Pooling2D(ADFLayer):
     """Pooling layer for arbitrary pooling functions, for 2D inputs.
 
-    Assumed Density Filtering (ADF) version of the Keras `Pooling2D` layer.
+    Assumed Density Filtering (ADF) version of the abstract Keras ``Pooling2D``
+    layer.
 
     This class only exists for code reuse. It will never be an exposed API.
 
     Parameters
     ----------
     pool_function : callable
-        The pooling function to apply, e.g. `tf.nn.max_pool2d`.
+        The pooling function to apply, e.g. ``tf.nn.max_pool2d``.
     pool_size : int or tuple of int
-        An integer or tuple/list of two integers, (pool_height, pool_width)
+        An integer or tuple/list of two integers, ``(pool_height, pool_width)``
         specifying the size of the pooling window. Can be a single integer to
         specify the same value for all spatial dimensions.
     strides : int or tuple of int or `None`
         An integer or tuple/list of two integers, specifying the strides of
         the pooling operation. Can be a single integer to specify the same
-        value for all spatial dimensions. If `None`, the `pool_size` will be
+        value for all spatial dimensions. If `None`, the ``pool_size`` will be
         used. Default is `None`.
     padding : {"valid", "same"}, optional
         The padding method. Case-insensitive. Default is "valid".
     data_format : {"channels_last", "channels_first"}, optional
         The ordering of the dimensions in the inputs.
-        `channels_last` corresponds to inputs with shape
-        `(batch, height, width, channels)` while `channels_first` corresponds
-        to inputs with shape `(batch, channels, height, width)`.
-        It defaults to the `image_data_format` value found in your
-        Keras config file at `~/.keras/keras.json`.
+        "channels_last" corresponds to inputs with shape
+        ``(batch, height, width, channels)`` while "channels_first" corresponds
+        to inputs with shape ``(batch, channels, height, width)``.
+        It defaults to the ``image_data_format`` value found in your
+        Keras config file at ``~/.keras/keras.json``.
         If you never set it, then it will be "channels_last".
     """
 
@@ -668,49 +664,46 @@ class Pooling2D(ADFLayer):
 class MaxPooling2D(Pooling2D):
     """Max pooling layer for 2D inputs.
 
-    Assumed Density Filtering (ADF) version of the Keras `MaxPooling2D` layer.
+    Assumed Density Filtering (ADF) version of `keras.layers.MaxPooling2D`.
 
     Parameters
     ----------
     pool_size : int or tuple of int, optional
-        An integer or tuple/list of two integers, (pool_height, pool_width)
+        An integer or tuple/list of two integers, ``(pool_height, pool_width)``
         specifying the size of the pooling window. Can be a single integer to
         specify the same value for all spatial dimensions.
-        Default is (2,2).
+        Default is ``(2,2)``.
     strides : int or tuple of int or `None`
         An integer or tuple/list of two integers, specifying the strides of
         the pooling operation. Can be a single integer to specify the same
-        value for all spatial dimensions. If `None`, the `pool_size` will be
+        value for all spatial dimensions. If `None`, the ``pool_size`` will be
         used. Default is `None`.
     padding : {"valid", "same"}, optional
         The padding method. Case-insensitive. Default is "valid".
     data_format : {"channels_last", "channels_first"}, optional
         The ordering of the dimensions in the inputs.
-        `channels_last` corresponds to inputs with shape
-        `(batch, height, width, channels)` while `channels_first` corresponds
-        to inputs with shape `(batch, channels, height, width)`.
-        It defaults to the `image_data_format` value found in your
-        Keras config file at `~/.keras/keras.json`.
+        "channels_last" corresponds to inputs with shape
+        ``(batch, height, width, channels)`` while "channels_first" corresponds
+        to inputs with shape ``(batch, channels, height, width)``.
+        It defaults to the ``image_data_format`` value found in your
+        Keras config file at ``~/.keras/keras.json``.
         If you never set it, then it will be "channels_last".
 
 
     Notes
     -----
-    Input shape:
-        - If `data_format='channels_last'`:
-            4D tensor with shape:
-            `(batch_size, rows, cols, channels)`
-        - If `data_format='channels_first'`:
-            4D tensor with shape:
-            `(batch_size, channels, rows, cols)`
+    Input shape
+        4D tensor with shape ``(batch_size, rows, cols, channels)`` if
+        ``data_format`` is "channels_last" or shape
+        ``(batch_size, channels, rows, cols)`` if ``data_format`` is
+        "channels_first".
 
-    Output shape:
-        - If `data_format='channels_last'`:
-            4D tensor with shape:
-            `(batch_size, pooled_rows, pooled_cols, channels)`
-        - If `data_format='channels_first'`:
-            4D tensor with shape:
-            `(batch_size, channels, pooled_rows, pooled_cols)`
+    Output shape
+        4D tensor with shape
+        ``(batch_size, pooled_rows, pooled_cols, channels)`` if ``data_format``
+        is "channels_last" or shape
+        ``(batch_size, channels, pooled_rows, pooled_cols)`` if ``data_format``
+        is "channels_first".
     """
 
     def __init__(
@@ -739,50 +732,46 @@ class MaxPooling2D(Pooling2D):
 class AveragePooling2D(Pooling2D):
     """Average pooling layer for 2D inputs.
 
-    Assumed Density Filtering (ADF) version of the Keras `AveragePooling2D`
-    layer.
+    Assumed Density Filtering (ADF) version of `keras.layers.AveragePooling2D`.
 
     Parameters
     ----------
     pool_size : int or tuple of int, optional
-        An integer or tuple/list of two integers, (pool_height, pool_width)
+        An integer or tuple/list of two integers, ``(pool_height, pool_width)``
         specifying the size of the pooling window. Can be a single integer to
         specify the same value for all spatial dimensions.
-        Default is (2,2).
+        Default is ``(2,2)``.
     strides : int or tuple of int or `None`
         An integer or tuple/list of two integers, specifying the strides of
         the pooling operation. Can be a single integer to specify the same
-        value for all spatial dimensions. If `None`, the `pool_size` will be
+        value for all spatial dimensions. If `None`, the ``pool_size`` will be
         used. Default is `None`.
     padding : {"valid", "same"}, optional
         The padding method. Case-insensitive. Default is "valid".
     data_format : {"channels_last", "channels_first"}, optional
         The ordering of the dimensions in the inputs.
-        `channels_last` corresponds to inputs with shape
-        `(batch, height, width, channels)` while `channels_first` corresponds
-        to inputs with shape `(batch, channels, height, width)`.
-        It defaults to the `image_data_format` value found in your
-        Keras config file at `~/.keras/keras.json`.
+        "channels_last" corresponds to inputs with shape
+        ``(batch, height, width, channels)`` while "channels_first" corresponds
+        to inputs with shape ``(batch, channels, height, width)``.
+        It defaults to the ``image_data_format`` value found in your
+        Keras config file at ``~/.keras/keras.json``.
         If you never set it, then it will be "channels_last".
 
 
     Notes
     -----
-    Input shape:
-        - If `data_format='channels_last'`:
-            4D tensor with shape:
-            `(batch_size, rows, cols, channels)`
-        - If `data_format='channels_first'`:
-            4D tensor with shape:
-            `(batch_size, channels, rows, cols)`
+    Input shape
+        4D tensor with shape ``(batch_size, rows, cols, channels)`` if
+        ``data_format`` is "channels_last" or shape
+        ``(batch_size, channels, rows, cols)`` if ``data_format`` is
+        "channels_first".
 
-    Output shape:
-        - If `data_format='channels_last'`:
-            4D tensor with shape:
-            `(batch_size, pooled_rows, pooled_cols, channels)`
-        - If `data_format='channels_first'`:
-            4D tensor with shape:
-            `(batch_size, channels, pooled_rows, pooled_cols)`
+    Output shape
+        4D tensor with shape
+        ``(batch_size, pooled_rows, pooled_cols, channels)`` if ``data_format``
+        is "channels_last" or shape
+        ``(batch_size, channels, pooled_rows, pooled_cols)`` if ``data_format``
+        is "channels_first".
     """
 
     def __init__(

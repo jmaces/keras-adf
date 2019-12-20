@@ -26,21 +26,22 @@ def relu(x, alpha=0.0, max_value=None, threshold=0.0, mode="diag"):
     x : list or tuple
         Input tensors (means and covariances).
     alpha: float, optional
-        Slope of negative section. Default is `0.0`.
+        Slope of negative section. Default is ``0.0``.
         Currently no value other than the default is supported for  ADF.
     max_value: float, optional
         Saturation threshold. Default is `None`.
         Currently no value other than the default is supported for  ADF.
     threshold: float, optional
-        Threshold value for thresholded activation. Default is `0.0`.
+        Threshold value for thresholded activation. Default is ``0.0``.
         Currently no value other than the default is supported for  ADF.
     mode: {"diag", "diagonal", "lowrank", "half", "full"}
         Covariance computation mode. Default is "diag".
 
     Returns
     -------
+    list
         List of transformed means and covariances, according to
-        the ReLU activation: `max(x, 0)`.
+        the ReLU activation: ``max(x, 0)``.
 
     """
     if not alpha == 0.0:
@@ -160,8 +161,9 @@ def linear(x, mode="diag"):
 
     Returns
     -------
+    list
         List of transformed means and covariances, according to
-        the linear identity activation: `x`.
+        the linear identity activation: ``x``.
 
     """
     means, covariances = x

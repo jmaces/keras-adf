@@ -13,7 +13,8 @@ from .core import ADFLayer
 class Conv(ADFLayer):
     """Abstract nD convolution layer (private, used as implementation base).
 
-    Assumed Density Filtering (ADF) version of the Keras `Conv` layer.
+    Assumed Density Filtering (ADF) version of the abstract Keras ``Conv``
+    layer.
 
 
     Parameters
@@ -23,51 +24,51 @@ class Conv(ADFLayer):
     filters : int
         Dimensionality of the output space (i.e. the number of filters in
         the convolution).
-    kernel_size : int or tuple/list of int
+    kernel_size : int or tuple of int or list of int
         An integer or tuple/list of n integers, specifying the length of the
         convolution window.
-    strides : int or tuple/list of int, optional
+    strides : int or tuple of int or list of int, optional
         An integer or tuple/list of n integers, specifying the stride length of
         the convolution. Specifying any stride value != 1 is incompatible with
-        specifying any `dilation_rate` value != 1. Default is 1.
+        specifying any ``dilation_rate`` value != 1. Default is 1.
     padding : {"valid", "same"}, optional
         The padding method. Case-insensitive. Default is "valid".
     data_format : {"channels_last", "channels_first"}, optional
         The ordering of the dimensions in the inputs.
-        `channels_last` corresponds to inputs with shape
-        `(batch, ..., channels)` while `channels_first` corresponds to
-        inputs with shape `(batch, channels, ...)`.
-        It defaults to the `image_data_format` value found in your
-        Keras config file at `~/.keras/keras.json`.
+        "channels_last" corresponds to inputs with shape
+        ``(batch, ..., channels)`` while "channels_first" corresponds to
+        inputs with shape ``(batch, channels, ...)``.
+        It defaults to the ``image_data_format`` value found in your
+        Keras config file at ``~/.keras/keras.json``.
         If you never set it, then it will be "channels_last".
-    dilation_rate : int or tuple/list of int, optional
+    dilation_rate : int or tuple of int or list of int, optional
         An integer or tuple/list of n integers, specifying
         the dilation rate to use for dilated convolution.
-        Currently, specifying any `dilation_rate` value != 1 is
-        incompatible with specifying any `strides` value != 1. Default is 1.
+        Currently, specifying any ``dilation_rate`` value != 1 is
+        incompatible with specifying any ``strides`` value != 1. Default is 1.
     activation : callable or string, optional
         Activation function to use. Default is no activation
-        (ie. "linear" activation: `a(x) = x`).
+        (ie. "linear" activation: ``a(x) = x``).
     use_bias : bool
         Whether the layer uses a bias.
     kernel_initializer : Initializer or string, optional
-        Initializer for the convolution `kernel`.
-        Default is `glorot_uniform` initialization.
+        Initializer for the convolution ``kernel``.
+        Default is "glorot_uniform" initialization.
     bias_initializer : Initializer or string, optional
         Initializer for the bias vector. Default is `None`.
     kernel_regularizer : Regularizer or string, optional
-        Regularizer function applied to the convolution `kernel`.
+        Regularizer function applied to the convolution ``kernel``.
         Default is `None`.
-    bias_regularizer : Regulairzer or string, optional
+    bias_regularizer : Regularizer or string, optional
         Regularizer function applied to the bias vector.
         Default is `None`.
     activity_regularizer : Regularizer or string, optional
         Regularizer function applied to the output of the layer.
         Default is `None`.
-    kernel_constraint: Constraint or string, optional
-        Constraint function applied to the convolution `kernel`.
+    kernel_constraint : Constraint or string, optional
+        Constraint function applied to the convolution ``kernel``.
         Default is `None`.
-    bias_constraint: Constraint or string, optional
+    bias_constraint : Constraint or string, optional
         Constraint function applied to the bias vector.
         Default is `None`.
     """
@@ -430,9 +431,9 @@ class Conv(ADFLayer):
 
 
 class Conv1D(Conv):
-    """1D convolution layer (e.g. temporal convolution).
+    """1D convolution layer (for example temporal convolution).
 
-    Assumed Density Filtering (ADF) version of the Keras `Conv1D` layer.
+    Assumed Density Filtering (ADF) version of `keras.layers.Conv1D`.
 
 
     Parameters
@@ -440,72 +441,69 @@ class Conv1D(Conv):
     filters : int
         Dimensionality of the output space (i.e. the number of filters in
         the convolution).
-    kernel_size : int or tuple/list of int
-        An integer or tuple/list of a single integer, specifying the length of
-        the convolution window.
-    strides : int or tuple/list of int, optional
+    kernel_size : int or tuple of int or list of int
+        An integer or tuple of int or list of a single integer, specifying the
+        length of the convolution window.
+    strides : int or tuple of int or list of int, optional
         An integer or tuple/list of a single integer, specifying the stride
         length of the convolution. Specifying any stride value != 1 is
-        incompatible with specifying any `dilation_rate` value != 1.
+        incompatible with specifying any ``dilation_rate`` value != 1.
         Default is 1.
     padding : {"valid", "same"}, optional
         The padding method. Case-insensitive. Default is "valid".
     data_format : {"channels_last", "channels_first"}, optional
         The ordering of the dimensions in the inputs.
-        `channels_last` corresponds to inputs with shape
-        `(batch, steps, features)` while `channels_first` corresponds to
-        inputs with shape `(batch, features, steps)`.
-        It defaults to the `image_data_format` value found in your
-        Keras config file at `~/.keras/keras.json`.
+        "channels_last" corresponds to inputs with shape
+        ``(batch, steps, features)`` while "channels_first" corresponds to
+        inputs with shape ``(batch, features, steps)``.
+        It defaults to the ``image_data_format`` value found in your
+        Keras config file at ``~/.keras/keras.json``.
         If you never set it, then it will be "channels_last".
-    dilation_rate : int or tuple/list of int, optional
+    dilation_rate : int or tuple of int or list of int, optional
         An integer or tuple/list of a single integer, specifying
         the dilation rate to use for dilated convolution.
-        Currently, specifying any `dilation_rate` value != 1 is
-        incompatible with specifying any `strides` value != 1. Default is 1.
+        Currently, specifying any ``dilation_rate`` value != 1 is
+        incompatible with specifying any ``strides`` value != 1. Default is 1.
     activation : callable or string, optional
         Activation function to use. Default is no activation
-        (ie. "linear" activation: `a(x) = x`).
+        (ie. "linear" activation: ``a(x) = x``).
     use_bias : bool
         Whether the layer uses a bias.
     kernel_initializer : Initializer or string, optional
-        Initializer for the convolution `kernel`.
-        Default is `glorot_uniform` initialization.
+        Initializer for the convolution ``kernel``.
+        Default is "glorot_uniform" initialization.
     bias_initializer : Initializer or string, optional
         Initializer for the bias vector. Default is `None`.
     kernel_regularizer : Regularizer or string, optional
-        Regularizer function applied to the convolution `kernel`.
+        Regularizer function applied to the convolution ``kernel``.
         Default is `None`.
-    bias_regularizer : Regulairzer or string, optional
+    bias_regularizer : Regularizer or string, optional
         Regularizer function applied to the bias vector.
         Default is `None`.
     activity_regularizer : Regularizer or string, optional
         Regularizer function applied to the output of the layer.
         Default is `None`.
-    kernel_constraint: Constraint or string, optional
-        Constraint function applied to the convolution `kernel`.
+    kernel_constraint : Constraint or string, optional
+        Constraint function applied to the convolution ``kernel``.
         Default is `None`.
-    bias_constraint: Constraint or string, optional
+    bias_constraint : Constraint or string, optional
         Constraint function applied to the bias vector.
         Default is `None`.
 
+
     Notes
     -----
-    Input shape:
-        3D tensor with shape:
-        `(samples, features, steps)` if data_format='channels_first'
-        or 3D tensor with shape:
-        `(samples, steps, features)` if data_format='channels_last'.
+    Input shape
+        3D tensor with shape ``(samples, features, steps)`` if ``data_format``
+        is "channels_first" or shape ``(samples, steps, features)`` if
+        ``data_format`` is "channels_last".
 
-    Output shape:
-        3D tensor with shape:
-            `(samples, filters, new_steps)`
-            if data_format='channels_first'
-        or 3D tensor with shape:
-            `(samples, new_steps, filters)`
-            if data_format='channels_last'.
-        `new_steps` value might be different from `steps` due to padding.
-
+    Output shape
+        3D tensor with shape ``(samples, filters, new_steps)`` if
+        ``data_format`` is "channels_first" or shape
+        ``(samples, new_steps, filters)`` if ``data_format`` is
+        "channels_last".
+        ``new_steps`` value might be different from ``steps`` due to padding.
     """
 
     def __init__(
@@ -549,9 +547,9 @@ class Conv1D(Conv):
 
 
 class Conv2D(Conv):
-    """2D convolution layer (e.g. spatial convolution).
+    """2D convolution layer (for example spatial convolution).
 
-    Assumed Density Filtering (ADF) version of the Keras `Conv2D` layer.
+    Assumed Density Filtering (ADF) version of `keras.layers.Conv2D`.
 
 
     Parameters
@@ -559,72 +557,71 @@ class Conv2D(Conv):
     filters : int
         Dimensionality of the output space (i.e. the number of filters in
         the convolution).
-    kernel_size : int or tuple/list of int
+    kernel_size : int or tuple of int or list of int
         An integer or tuple/list of two integers, specifying the width and
         height of the convolution window.
-    strides : int or tuple/list of int, optional
+    strides : int or tuple of int or list of int, optional
         An integer or tuple/list of two integers, specifying the stride
         lengths of the convolution. Specifying any stride value != 1 is
-        incompatible with specifying any `dilation_rate` value != 1.
+        incompatible with specifying any ``dilation_rate`` value != 1.
         Default is 1.
     padding : {"valid", "same"}, optional
         The padding method. Case-insensitive. Default is "valid".
     data_format : {"channels_last", "channels_first"}, optional
         The ordering of the dimensions in the inputs.
-        `channels_last` corresponds to inputs with shape
-        `(batch, height, width, channels)` while `channels_first` corresponds
-        to inputs with shape `(batch, channels, height, width)`.
-        It defaults to the `image_data_format` value found in your
-        Keras config file at `~/.keras/keras.json`.
+        "channels_last" corresponds to inputs with shape
+        ``(batch, height, width, channels)`` while "channels_first" corresponds
+        to inputs with shape ``(batch, channels, height, width)``.
+        It defaults to the ``image_data_format`` value found in your
+        Keras config file at ``~/.keras/keras.json``.
         If you never set it, then it will be "channels_last".
-    dilation_rate : int or tuple/list of int, optional
+    dilation_rate : int or tuple of int or list of int, optional
         An integer or tuple/list of two integers, specifying
         the dilation rates to use for dilated convolution.
-        Currently, specifying any `dilation_rate` value != 1 is
-        incompatible with specifying any `strides` value != 1. Default is 1.
+        Currently, specifying any ``dilation_rate`` value != 1 is
+        incompatible with specifying any ``strides`` value != 1. Default is 1.
     activation : callable or string, optional
         Activation function to use. Default is no activation
-        (ie. "linear" activation: `a(x) = x`).
+        (ie. "linear" activation: ``a(x) = x``).
     use_bias : bool
         Whether the layer uses a bias.
     kernel_initializer : Initializer or string, optional
-        Initializer for the convolution `kernel`.
-        Default is `glorot_uniform` initialization.
+        Initializer for the convolution ``kernel``.
+        Default is "glorot_uniform" initialization.
     bias_initializer : Initializer or string, optional
         Initializer for the bias vector. Default is `None`.
     kernel_regularizer : Regularizer or string, optional
-        Regularizer function applied to the convolution `kernel`.
+        Regularizer function applied to the convolution ``kernel``.
         Default is `None`.
-    bias_regularizer : Regulairzer or string, optional
+    bias_regularizer : Regularizer or string, optional
         Regularizer function applied to the bias vector.
         Default is `None`.
     activity_regularizer : Regularizer or string, optional
         Regularizer function applied to the output of the layer.
         Default is `None`.
     kernel_constraint: Constraint or string, optional
-        Constraint function applied to the convolution `kernel`.
+        Constraint function applied to the convolution ``kernel``.
         Default is `None`.
     bias_constraint: Constraint or string, optional
         Constraint function applied to the bias vector.
         Default is `None`.
 
+
     Notes
     -----
-    Input shape:
-        4D tensor with shape:
-        `(samples, channels, height, width)` if data_format='channels_first'
-        or 4D tensor with shape:
-        `(samples, height, width, channels)` if data_format='channels_last'.
+    Input shape
+        4D tensor with shape ``(samples, channels, height, width)`` if
+        ``data_format`` is "channels_first" or shape
+        ``(samples, height, width, channels)`` if ``data_format`` is
+        "channels_last".
 
-    Output shape:
-        4D tensor with shape:
-            `(samples, filters, new_height, new_width)`
-            if data_format='channels_first'
-        or 4D tensor with shape:
-            `(samples, new_height, new_width, filters)`
-            if data_format='channels_last'.
-        `new_height` and `new_width` values might be different from `height`
-        and `width` due to padding.
+    Output shape
+        4D tensor with shape ``(samples, filters, new_height, new_width)``
+        if ``data_format`` is "channels_first" or shape
+        ``(samples, new_height, new_width, filters)`` if ``data_format`` is
+        "channels_last".
+        ``new_height`` and ``new_width`` values might be different from
+        ``height`` and ``width`` due to padding.
 
     """
 
