@@ -33,6 +33,4 @@ Changes
 
   + kerasadf.layers.pooling.AveragePooling1D
   + kerasadf.layers.pooling.AveragePooling2D
-
-
-----
+  
