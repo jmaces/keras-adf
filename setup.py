@@ -34,7 +34,7 @@ CLASSIFIERS = [
     "Topic :: Scientific/Engineering :: Information Analysis",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Mathematics",
-    # "Private :: Do Not Upload",  # safeguard - remove for actual packages
+    "Private :: Do Not Upload",  # safeguard - remove for actual packages
 ]
 INSTALL_REQUIRES = ["tensorflow<=1.15,>=1.14", "numpy"]  # no TF 2.0 yet
 EXTRAS_REQUIRE = {

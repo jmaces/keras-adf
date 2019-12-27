@@ -12,7 +12,7 @@ from __future__ import absolute_import, division, print_function
 
 
 # package meta data
-__version__ = "19.1.0"  # 0Y.Minor.Micro CalVer format
+__version__ = "19.2.0.dev0"  # 0Y.Minor.Micro CalVer format
 __title__ = "keras-adf"
 __description__ = "Assumed Density Filtering (ADF) Probabilistic Networks"
 __url__ = "https://github.com/jmaces/keras-adf"
