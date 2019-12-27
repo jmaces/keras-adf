@@ -1,6 +1,6 @@
 """keras-adf layers API."""
-from tensorflow.python.keras.layers import deserialize as _kerasdeserialize
-from tensorflow.python.keras.layers import serialize
+from tensorflow.keras.layers import deserialize as _kerasdeserialize
+from tensorflow.keras.layers import serialize
 
 from .convolutional import Conv1D, Conv2D
 from .core import Dense, Flatten
@@ -25,8 +25,7 @@ def deserialize(config, custom_objects=None):
 
 
 # export API
-__all__ = [
-    *_LAYER_DICT.values(),
+__all__ = list(_LAYER_DICT.values()) + [
     serialize,
     deserialize,
 ]

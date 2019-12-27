@@ -1,9 +1,9 @@
 import numpy as np
 
+from tensorflow.keras import backend as K
+from tensorflow.keras import constraints, initializers, regularizers
 from tensorflow.python.eager import context
 from tensorflow.python.framework import tensor_shape
-from tensorflow.python.keras import backend as K
-from tensorflow.python.keras import constraints, initializers, regularizers
 from tensorflow.python.keras.engine.base_layer import InputSpec, Layer
 from tensorflow.python.keras.utils import conv_utils
 

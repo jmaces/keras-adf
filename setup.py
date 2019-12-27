@@ -37,7 +37,7 @@ CLASSIFIERS = [
     "Topic :: Scientific/Engineering :: Mathematics",
     "Private :: Do Not Upload",  # safeguard - remove for actual packages
 ]
-INSTALL_REQUIRES = ["tensorflow<=1.15", "numpy"]  # TF 2.0 not yet supported
+INSTALL_REQUIRES = ["tensorflow<=1.15,>=1.14", "numpy"]  # no TF 2.0 yet
 EXTRAS_REQUIRE = {
     "docs": ["sphinx>=1.6.5", "numpydoc"],  # numpydoc needs sphinx 1.6.5+
     "tests": [

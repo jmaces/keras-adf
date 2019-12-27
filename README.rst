@@ -25,13 +25,13 @@
 ``keras-adf`` provides implementations for probabilistic
 `Tensorflow <https://www.tensorflow.org/>`_/`Keras <https://keras.io/>`_ neural network layers,
 which are based on assumed density filtering.
-:term:`assumed density filtering` (ADF) is a general concept from Bayesian inference, but in the case of feed-forward neural networks that we consider here
+Assumed density filtering (ADF) is a general concept from Bayesian inference, but in the case of feed-forward neural networks that we consider here
 it is a way to approximately propagate a random distribution through the neural network.
 
 The layers in this package have the same names and arguments as their corresponding
 Keras version. We use Gaussian distributions for our ADF approximations, which are
 described by their means and (co-)variances. So unlike the standard Keras layers,
-each `kerasadf` layer takes two inputs and produces two outputs (one for the means
+each ``keras-adf`` layer takes two inputs and produces two outputs (one for the means
 and one for the (co-)variances).
 
 .. teaser-end
@@ -39,7 +39,7 @@ and one for the (co-)variances).
 
 .. example
 
-`kerasadf` layers can be used exactly like the corresponding `Keras <https://keras.io/>`_
+``keras-adf`` layers can be used exactly like the corresponding `Keras <https://keras.io/>`_
 layers within a Keras model. However, as mentioned above, ADF layers take two inputs and produce two outputs
 instead of one, so it is not possible to simply mix ADF and standard layers within the same model.
 

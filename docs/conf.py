@@ -89,9 +89,9 @@ numpydoc_xref_aliases = {
     "Initializer": "keras.initializers.Initializer",
     "Regularizer": "keras.regularizers.Regularizer",
 }
-numpydoc_show_class_members = False            # only class names in toc
+numpydoc_show_class_members = False  # only class names in toc
 numpydoc_show_inherited_class_members = False  # only class names in toc
-numpydoc_class_members_toctree = False         # we use a single page per class
+numpydoc_class_members_toctree = False  # we use a single page per class
 autodoc_member_order = "groupwise"
 autodoc_inherit_docstrings = False  # inherited strings not in numpydoc format
 
@@ -102,7 +102,7 @@ intersphinx_mapping = {
     "tensorflow": (
         "https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/",
         "objects_tf.inv",
-    )
+    ),
 }
 
 # Add any paths that contain templates here, relative to this directory.

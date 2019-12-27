@@ -1,9 +1,11 @@
 """Tests for `kerasadf.activations`. """
+from __future__ import absolute_import, division, print_function
+
 import numpy as np
 import pytest
 
 from hypothesis import given
-from tensorflow.python.keras import backend as K
+from tensorflow.keras import backend as K
 
 import kerasadf.activations
 import kerasadf.layers

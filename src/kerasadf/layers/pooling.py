@@ -1,5 +1,5 @@
 import numpy as np
-import tensorflow.python.keras.backend as K
+import tensorflow.keras.backend as K
 
 from tensorflow.python.framework import tensor_shape
 from tensorflow.python.keras.engine.base_layer import InputSpec

@@ -1,10 +1,12 @@
 """Tests for `kerasadf.layers.core`. """
+from __future__ import absolute_import, division, print_function
+
 import hypothesis.strategies as st
 
 from hypothesis import given, settings
-from tensorflow.python.keras import backend as K
-from tensorflow.python.keras.layers import Input
-from tensorflow.python.keras.models import Model
+from tensorflow.keras import backend as K
+from tensorflow.keras.layers import Input
+from tensorflow.keras.models import Model
 
 import kerasadf.layers
 
