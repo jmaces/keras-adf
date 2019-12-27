@@ -13,3 +13,26 @@ Changes for the upcoming release can be found in the `"changelog.d" directory <h
    See our contribution guide for details.
 
 .. towncrier release notes start
+
+19.1.0 (2019-12-27)
+-------------------
+
+Changes
+^^^^^^^
+
+- Initial release. `#1 <https://github.com/jmaces/keras-adf/issues/1>`_
+
+  + kerasadf.activations.linear
+  + kerasadf.activations.relu
+
+  + kerasadf.layers.core.Dense
+  + kerasadf.layers.core.Flatten
+
+  + kerasadf.layers.convolutional.Conv1D
+  + kerasadf.layers.convolutional.Conv2D
+
+  + kerasadf.layers.pooling.AveragePooling1D
+  + kerasadf.layers.pooling.AveragePooling2D
+
+
+----
