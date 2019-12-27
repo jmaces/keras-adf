@@ -18,7 +18,7 @@ KEYWORDS = [
     "machine-learning",
 ]
 CLASSIFIERS = [
-    "Development Status :: 1 - Planning",
+    "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Natural Language :: English",
@@ -28,21 +28,21 @@ CLASSIFIERS = [
     "Programming Language :: Python :: 2",
     "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.4",
     "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
     "Topic :: Scientific/Engineering :: Mathematics",
-    "Private :: Do Not Upload",  # safeguard - remove for actual packages
+    # "Private :: Do Not Upload",  # safeguard - remove for actual packages
 ]
-INSTALL_REQUIRES = ["tensorflow"]
+INSTALL_REQUIRES = ["tensorflow<=1.15,>=1.14", "numpy"]  # no TF 2.0 yet
 EXTRAS_REQUIRE = {
     "docs": ["sphinx>=1.6.5", "numpydoc"],  # numpydoc needs sphinx 1.6.5+
     "tests": [
         "coverage",
         "hypothesis[numpy]",
+        "scipy",
         "pytest>=4.3.0",  # 4.3.0 dropped last use of `convert`
     ],
 }

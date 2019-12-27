@@ -65,6 +65,7 @@ nitpick_ignore = [
     # ("py:class", "iterable"),
     # ("py:class", "iterables"),
     # ("py:class", "tuple of types"),
+    # ("py:class", "list of types"),
 ]
 
 # Add any Sphinx extension module names here, as strings. They can be
@@ -78,16 +79,30 @@ extensions = [
     "sphinx.ext.mathjax",
     "numpydoc",
 ]
+autosummary_generate = True
 
 # numpydoc settings
 numpydoc_xref_param_type = True
-numpydoc_xref_ignore = {"type", "optional", "default"}
-
+numpydoc_xref_ignore = {"type", "optional", "default", "of"}
+numpydoc_xref_aliases = {
+    "Constraint": "keras.constraints.Constraint",
+    "Initializer": "keras.initializers.Initializer",
+    "Regularizer": "keras.regularizers.Regularizer",
+}
+numpydoc_show_class_members = False  # only class names in toc
+numpydoc_show_inherited_class_members = False  # only class names in toc
+numpydoc_class_members_toctree = False  # we use a single page per class
+autodoc_member_order = "groupwise"
+autodoc_inherit_docstrings = False  # inherited strings not in numpydoc format
 
 # Intersphinx settings
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3/", None),
     "numpy": ("https://numpy.org/doc/1.17/", None),
+    "tensorflow": (
+        "https://www.tensorflow.org/versions/r1.15/api_docs/python/tf/",
+        "objects_tf.inv",
+    ),
 }
 
 # Add any paths that contain templates here, relative to this directory.
