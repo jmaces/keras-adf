@@ -1,4 +1,4 @@
-kerasadf.activations.linear
+﻿kerasadf.activations.linear
 ===========================
 
 .. currentmodule:: kerasadf.activations

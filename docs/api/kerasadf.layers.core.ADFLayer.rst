@@ -1,4 +1,4 @@
-kerasadf.layers.core.ADFLayer
+﻿kerasadf.layers.core.ADFLayer
 =============================
 
 .. currentmodule:: kerasadf.layers.core

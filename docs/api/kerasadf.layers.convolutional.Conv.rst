@@ -1,4 +1,4 @@
-kerasadf.layers.convolutional.Conv
+﻿kerasadf.layers.convolutional.Conv
 ==================================
 
 .. currentmodule:: kerasadf.layers.convolutional

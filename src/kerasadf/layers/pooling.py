@@ -398,7 +398,8 @@ class AveragePooling1D(Pooling1D):
                 ([-1] + cov_shape[1:4] + out_shape[-3:]),
             )
             covariances = K.permute_dimensions(
-                covariances, ([0] + list(range(4, 7)) + list(range(1, 4))),
+                covariances,
+                ([0] + list(range(4, 7)) + list(range(1, 4))),
             )
             covariances = K.reshape(covariances, [-1] + cov_shape[1:4])
             covariances = K.reshape(
@@ -413,7 +414,8 @@ class AveragePooling1D(Pooling1D):
             )
             outputs[1] = K.reshape(
                 K.permute_dimensions(
-                    covariances, ([0] + list(range(4, 7)) + list(range(1, 4))),
+                    covariances,
+                    ([0] + list(range(4, 7)) + list(range(1, 4))),
                 ),
                 [-1] + output_shapes[1].as_list()[1:],
             )
@@ -850,7 +852,8 @@ class AveragePooling2D(Pooling2D):
                 ([-1] + cov_shape[1:4] + output_shapes[1].as_list()[-3:]),
             )
             covariances = K.permute_dimensions(
-                covariances, ([0] + list(range(4, 7)) + list(range(1, 4))),
+                covariances,
+                ([0] + list(range(4, 7)) + list(range(1, 4))),
             )
             covariances = K.reshape(covariances, [-1] + cov_shape[1:4])
             covariances = K.reshape(
@@ -870,6 +873,7 @@ class AveragePooling2D(Pooling2D):
                 ),
             )
             outputs[1] = K.permute_dimensions(
-                covariances, ([0] + list(range(4, 7)) + list(range(1, 4))),
+                covariances,
+                ([0] + list(range(4, 7)) + list(range(1, 4))),
             )
         return outputs

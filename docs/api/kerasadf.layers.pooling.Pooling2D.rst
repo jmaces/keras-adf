@@ -1,4 +1,4 @@
-kerasadf.layers.pooling.Pooling2D
+﻿kerasadf.layers.pooling.Pooling2D
 =================================
 
 .. currentmodule:: kerasadf.layers.pooling

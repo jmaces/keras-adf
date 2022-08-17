@@ -14,8 +14,6 @@ lines_between_types = 1
 multi_line_output = 3
 not_skip = "__init__.py"
 use_parentheses = true
-known_first_party = ["kerasadf"]
-known_third_party = ["hypothesis", "numpy", "pytest", "setuptools", "six", "tensorflow"]
 
 [tool.towncrier]
 package = "kerasadf"
