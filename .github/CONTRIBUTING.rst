@@ -16,7 +16,7 @@ Workflow
 - Try to stick to *one* change only per pull request.
 - Add tests and docs for your code. Contributions missing tests or
   documentation can not be merged.
-- Make sure all changes pass our CI_.
+- Make sure all changes pass our CI.
   We will not give any feedback until it is green unless you ask for it.
 - Once you have addressed review feedback bump the pull request with a short note, so we know you are done.
 
@@ -237,7 +237,6 @@ Thank you again for considering contributing to ``keras-adf``!
 .. _reStructuredText: https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html
 .. _semantic newlines: https://rhodesmill.org/brandon/2012/one-sentence-per-line/
 .. _examples page: https://github.com/jmaces/keras-adf/blob/master/docs/examples.rst
-.. _CI: https://travis-ci.com/jmaces/keras-adf
 .. _towncrier: https://pypi.org/project/towncrier
 .. _black: https://github.com/psf/black
 .. _pre-commit: https://pre-commit.com/

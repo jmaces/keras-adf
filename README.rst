@@ -7,8 +7,8 @@
     :target: https://keras-adf.readthedocs.io/en/latest/?badge=latest
     :alt: Documentation Status
 
-.. image:: https://travis-ci.com/jmaces/keras-adf.svg?branch=master
-    :target: https://travis-ci.com/jmaces/keras-adf?branch=master
+.. image:: https://github.com/jmaces/keras-adf/actions/workflows/pr-check.yml/badge.svg?branch=master
+    :target: https://github.com/jmaces/keras-adf/actions/workflows/pr-check.yml?branch=master
     :alt: CI Status
 
 .. image:: https://codecov.io/gh/jmaces/keras-adf/branch/master/graph/badge.svg
