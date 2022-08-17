@@ -1,4 +1,4 @@
-kerasadf.activations.relu
+﻿kerasadf.activations.relu
 =========================
 
 .. currentmodule:: kerasadf.activations

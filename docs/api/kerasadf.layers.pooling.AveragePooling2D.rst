@@ -1,4 +1,4 @@
-kerasadf.layers.pooling.AveragePooling2D
+﻿kerasadf.layers.pooling.AveragePooling2D
 ========================================
 
 .. currentmodule:: kerasadf.layers.pooling

@@ -1,4 +1,4 @@
-kerasadf.layers.core.Dense
+﻿kerasadf.layers.core.Dense
 ==========================
 
 .. currentmodule:: kerasadf.layers.core

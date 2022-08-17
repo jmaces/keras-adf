@@ -25,7 +25,7 @@ def deserialize(config, custom_objects=None):
 
 
 # export API
-__all__ = list(_LAYER_DICT.values()) + [
-    serialize,
-    deserialize,
+__all__ = list(_LAYER_DICT.keys()) + [
+    "serialize",
+    "deserialize",
 ]

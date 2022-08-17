@@ -1,4 +1,3 @@
-import codecs
 import os
 import re
 
@@ -25,10 +24,7 @@ CLASSIFIERS = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
     "Programming Language :: Python",
-    "Programming Language :: Python :: 2",
-    "Programming Language :: Python :: 2.7",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.5",
     "Programming Language :: Python :: 3.6",
     "Programming Language :: Python :: 3.7",
     "Topic :: Scientific/Engineering :: Information Analysis",
@@ -60,7 +56,7 @@ def read(*parts):
     Build an absolute path from *parts* and and return the contents of the
     resulting file.  Assume UTF-8 encoding.
     """
-    with codecs.open(os.path.join(HERE, *parts), "rb", "utf-8") as f:
+    with open(os.path.join(HERE, *parts), encoding="utf-8") as f:
         return f.read()
 
 
@@ -96,7 +92,7 @@ if __name__ == "__main__":
         long_description_content_type="text/x-rst",
         packages=PACKAGES,
         package_dir={"": "src"},
-        python_requires=">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*",
+        python_requires=">=3.6",
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,

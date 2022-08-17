@@ -79,14 +79,19 @@ def relu(x, alpha=0.0, max_value=None, threshold=0.0, mode="diag"):
         pass
     else:
         # if rank(mean)=2+n, treat as batch of rank=n tensors + channels
-        means = K.reshape(means, [-1] + [K.prod(means_shape[1:])],)
+        means = K.reshape(
+            means,
+            [-1] + [K.prod(means_shape[1:])],
+        )
         if mode == "diag":
             covariances = K.reshape(
-                covariances, [-1] + [K.prod(cov_shape[1:])],
+                covariances,
+                [-1] + [K.prod(cov_shape[1:])],
             )
         elif mode == "half":
             covariances = K.reshape(
-                covariances, [-1] + [cov_shape[1]] + [K.prod(cov_shape[2:])],
+                covariances,
+                [-1] + [cov_shape[1]] + [K.prod(cov_shape[2:])],
             )
         elif mode == "full":
             covariances = K.reshape(

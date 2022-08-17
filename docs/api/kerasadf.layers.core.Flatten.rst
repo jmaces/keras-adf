@@ -1,4 +1,4 @@
-kerasadf.layers.core.Flatten
+﻿kerasadf.layers.core.Flatten
 ============================
 
 .. currentmodule:: kerasadf.layers.core

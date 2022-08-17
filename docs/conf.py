@@ -27,8 +27,8 @@ sys.path.insert(0, os.path.abspath(os.path.join(ROOT, "src")))
 
 
 def read(*parts):
-    """ Build an absolute path from *parts* and and return the contents of the
-        resulting file.  Assume UTF-8 encoding.
+    """Build an absolute path from *parts* and and return the contents of the
+    resulting file.  Assume UTF-8 encoding.
     """
     with codecs.open(os.path.join(ROOT, *parts), "rb", "utf-8") as f:
         return f.read()
@@ -38,7 +38,7 @@ META_FILE = read(META_PATH)
 
 
 def find_meta(meta):
-    """ Extract __*meta*__ from META_FILE. """
+    """Extract __*meta*__ from META_FILE."""
     meta_match = re.search(
         r"^__{meta}__ = ['\"]([^'\"]*)['\"]".format(meta=meta), META_FILE, re.M
     )
@@ -50,7 +50,7 @@ def find_meta(meta):
 project = find_meta("title")
 author = find_meta("author")
 release = find_meta("version")
-version = release.rsplit(u".", 1)[0]
+version = release.rsplit(".", 1)[0]
 copyright = find_meta("copyright")
 
 

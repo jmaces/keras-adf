@@ -12,7 +12,7 @@ COVARIANCE_MODES = ["diag", "half", "full"]
 
 # array comparison helpers robust to precision loss
 def assert_eq(x, y, atol=None, rtol=1e-7):
-    """Robustly and symmetrically assert x == y componentwise. """
+    """Robustly and symmetrically assert x == y componentwise."""
     if atol is None:
         atol = max(np.finfo(x.dtype).eps, np.finfo(y.dtype).eps)
     tol = atol + rtol * np.maximum(np.abs(x), np.abs(y), dtype=np.float64)
@@ -20,7 +20,7 @@ def assert_eq(x, y, atol=None, rtol=1e-7):
 
 
 def assert_leq(x, y, atol=None, rtol=1e-7):
-    """Robustly assert x <= y componentwise. """
+    """Robustly assert x <= y componentwise."""
     if atol is None:
         atol = max(np.finfo(x.dtype).eps, np.finfo(y.dtype).eps)
     mask = np.greater(x, y)
